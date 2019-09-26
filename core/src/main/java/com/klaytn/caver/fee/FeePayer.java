@@ -45,7 +45,11 @@ public class FeePayer {
         KlaySignatureData feePayerSignatureData = getSignatureData(txType);
 
         List<RlpType> rlpTypeList = new ArrayList<>(txType.rlpValues());
-        rlpTypeList.add(new RlpList(txType.getSenderSignatureData().toRlpList()));
+        List<RlpType> signatureList = new ArrayList<>();
+        for (KlaySignatureData a : txType.getSenderSignatureData()) {
+            signatureList.add(new RlpList(a.toRlpList()));
+        }
+        rlpTypeList.add(new RlpList(signatureList));
         rlpTypeList.add(RlpString.create(Numeric.hexStringToByteArray(credentials.getAddress())));
         rlpTypeList.add(new RlpList(feePayerSignatureData.toRlpList()));
 
