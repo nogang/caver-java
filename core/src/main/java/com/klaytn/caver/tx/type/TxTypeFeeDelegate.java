@@ -95,8 +95,8 @@ public abstract class TxTypeFeeDelegate extends AbstractTxType{
     }
 
     public void addSignatureData(TxTypeFeeDelegate txType) {
-        addSenderSignatureDataList(txType.getSenderSignatureData());
-        addFeePayerSignatureDataList(txType.getSenderSignatureData());
+        addSenderSignatureData(txType.getSenderSignatureDataSet());
+        addFeePayerSignatureDataList(txType.getSenderSignatureDataSet());
     }
 
     public KlayRawTransaction sign(KlayCredentials credentials, int chainId) {

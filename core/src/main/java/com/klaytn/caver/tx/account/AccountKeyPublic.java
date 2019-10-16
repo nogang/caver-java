@@ -92,13 +92,11 @@ public class AccountKeyPublic implements AccountKey {
     }
 
     public String getX() {
-        String x = Numeric.toHexStringWithPrefixZeroPadded(new BigInteger(Numeric.cleanHexPrefix(this.x), 16),64);
-        return x;
+        return Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(this.x), 64);
     }
 
     public String getY() {
-        String y = Numeric.toHexStringWithPrefixZeroPadded(new BigInteger(Numeric.cleanHexPrefix(this.y), 16),64);
-        return y;
+        return Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(this.y), 64);
     }
 
     @Override
@@ -108,7 +106,7 @@ public class AccountKeyPublic implements AccountKey {
 
     @Override
     public String toString() {
-        return "x : " + getX() + " / y : " + getY();
+        return "AccountKeyPublic x : " + getX() + " / y : " + getY();
     }
 
     @Override

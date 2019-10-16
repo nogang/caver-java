@@ -88,38 +88,82 @@ public abstract class AbstractTxType implements TxType {
         this.senderSignatureDataSet = new HashSet<>();
     }
 
-    public void addSenderSignatureData(KlaySignatureData signatureData) {
+    @Deprecated
+    protected void setSenderSignatureData(KlaySignatureData signatureData) {
+        addSenderSignatureData(signatureData);
+    }
+
+    @Deprecated
+    public KlaySignatureData getSenderSignatureData() {
+        Iterator<KlaySignatureData> senderSignatureIterator = senderSignatureDataSet.iterator();
+        if (senderSignatureIterator.hasNext()) {
+            return senderSignatureIterator.next();
+        }
+        throw new RuntimeException("The use of `getSenderSignatureData()` is not recommended. Use `getSenderSignatureDataSet()` instead.\n");
+    }
+
+    /**
+     * add the sender's signature data
+     *
+     * @param signatureData sender's signature data
+     */
+    protected void addSenderSignatureData(KlaySignatureData signatureData) {
         senderSignatureDataSet.add(signatureData);
     }
 
-    public void addSenderSignatureDataList(Set<KlaySignatureData> signatureDataList) {
-        for (KlaySignatureData signatureData : signatureDataList) {
-            addSenderSignatureData(signatureData);
-        }
+    /**
+     * add the sender's signature data
+     *
+     * @param senderSignatureDataSet sender's signature data set
+     */
+    public void addSenderSignatureData(Set<KlaySignatureData> senderSignatureDataSet) {
+        this.senderSignatureDataSet.addAll(senderSignatureDataSet);
     }
 
+    /**
+     * add the sender's signature data
+     *
+     * @param signatureRlpTypeList rlp encoded sender's signature data
+     */
     protected void addSenderSignatureData(List<RlpType> signatureRlpTypeList) {
-        for (RlpType signiture : signatureRlpTypeList) {
-            RlpList vrs = (RlpList) signiture;
-            byte[] v = ((RlpString) vrs.getValues().get(0)).getBytes();
-            byte[] r = ((RlpString) vrs.getValues().get(1)).getBytes();
-            byte[] s = ((RlpString) vrs.getValues().get(2)).getBytes();
-            senderSignatureDataSet.add(new KlaySignatureData(v, r, s));
+        for (RlpType signature : signatureRlpTypeList) {
+            List<RlpType> vrs = ((RlpList) signature).getValues();
+            if (vrs.size() < 3) continue;
+            byte[] v = ((RlpString) vrs.get(0)).getBytes();
+            byte[] r = ((RlpString) vrs.get(1)).getBytes();
+            byte[] s = ((RlpString) vrs.get(2)).getBytes();
+            addSenderSignatureData(new KlaySignatureData(v, r, s));
         }
     }
 
+    /**
+     * add the sender's signature data
+     *
+     * @param values rlp encoded rawTransaction
+     * @param offset where sender's signature data begins
+     */
     public void addSignatureData(List<RlpType> values, int offset) {
         if (values.size() > offset) {
-            List<RlpType> senderSignitures = ((RlpList) (values.get(offset))).getValues();
-            this.addSenderSignatureData(senderSignitures);
+            List<RlpType> senderSignatures = ((RlpList) (values.get(offset))).getValues();
+            addSenderSignatureData(senderSignatures);
         }
     }
 
+    /**
+     * add the sender's signature data
+     *
+     * @param txType txType from which to extract signature
+     */
     public void addSignatureData(AbstractTxType txType) {
-        addSenderSignatureDataList(txType.getSenderSignatureData());
+        addSenderSignatureData(txType.getSenderSignatureDataSet());
     }
 
-    public Set<KlaySignatureData> getSenderSignatureData() {
+    /**
+     * returns the sender's signature data set.
+     *
+     * @return Set set of sender's signature data
+     */
+    public Set<KlaySignatureData> getSenderSignatureDataSet() {
         return senderSignatureDataSet;
     }
 
@@ -177,7 +221,7 @@ public abstract class AbstractTxType implements TxType {
             throw new Exception("An attempt was made to merge for a transaction that is not identical.");
         }
 
-        this.addSenderSignatureDataList(txType.getSenderSignatureData());
+        this.addSenderSignatureData(txType.getSenderSignatureDataSet());
     }
     /**
      * create rlp encoded value for signature component

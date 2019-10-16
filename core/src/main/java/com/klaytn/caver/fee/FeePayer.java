@@ -51,7 +51,7 @@ public class FeePayer {
         List<RlpType> rlpTypeList = new ArrayList<>(txType.rlpValues());
         List<RlpType> senderSignatureList = new ArrayList<>();
 
-        for (KlaySignatureData senderSignature : txType.getSenderSignatureData()) {
+        for (KlaySignatureData senderSignature : txType.getSenderSignatureDataSet()) {
             senderSignatureList.add(senderSignature.toRlpList());
         }
         rlpTypeList.add(new RlpList(senderSignatureList));
