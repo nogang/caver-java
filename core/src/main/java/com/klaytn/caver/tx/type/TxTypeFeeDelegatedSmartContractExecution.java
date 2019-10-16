@@ -81,7 +81,7 @@ public class TxTypeFeeDelegatedSmartContractExecution extends TxTypeFeeDelegate 
     /**
      * decode transaction hash from sender to reconstruct transaction with fee payer signature.
      *
-     * @param rawTransaction signed transaction hash from sender
+     * @param rawTransaction RLP-encoded signed transaction from sender
      * @return TxTypeFeeDelegatedSmartContractExecution decoded transaction
      */
     public static TxTypeFeeDelegatedSmartContractExecution decodeFromRawTransaction(byte[] rawTransaction) {
@@ -104,7 +104,7 @@ public class TxTypeFeeDelegatedSmartContractExecution extends TxTypeFeeDelegate 
     }
 
     /**
-     * @param rawTransaction signed transaction hash from sender
+     * @param rawTransaction RLP-encoded signed transaction from sender
      * @return TxTypeFeeDelegatedSmartContractExecution decoded transaction
      */
     public static TxTypeFeeDelegatedSmartContractExecution decodeFromRawTransaction(String rawTransaction) {

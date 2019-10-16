@@ -95,7 +95,7 @@ public class TxTypeFeeDelegatedAccountUpdateWithRatio extends TxTypeFeeDelegate 
     /**
      * decode transaction hash from sender to reconstruct transaction with fee payer signature.
      *
-     * @param rawTransaction signed transaction hash from sender
+     * @param rawTransaction RLP-encoded signed transaction from sender
      * @return TxTypeFeeDelegatedAccountUpdateWithRatio decoded transaction
      */
     public static TxTypeFeeDelegatedAccountUpdateWithRatio decodeFromRawTransaction(byte[] rawTransaction) {
@@ -119,7 +119,7 @@ public class TxTypeFeeDelegatedAccountUpdateWithRatio extends TxTypeFeeDelegate 
     }
 
     /**
-     * @param rawTransaction signed transaction hash from sender
+     * @param rawTransaction RLP-encoded signed transaction from sender
      * @return TxTypeFeeDelegatedAccountUpdateWithRatio decoded transaction
      */
     public static TxTypeFeeDelegatedAccountUpdateWithRatio decodeFromRawTransaction(String rawTransaction) {

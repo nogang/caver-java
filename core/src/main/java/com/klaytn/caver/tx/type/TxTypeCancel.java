@@ -65,26 +65,31 @@ public class TxTypeCancel extends AbstractTxType {
     }
 
     public static TxTypeCancel decodeFromRawTransaction(byte[] rawTransaction) {
-        int parsingIndex = 0;
-        byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+        // SenderTxHashRLP = type + encode([nonce, gasPrice, gas, from, txSignatures])
+        try {
+            byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
-        RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+            RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
+            List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+            BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+            BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+            BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+            String from = ((RlpString) values.get(3)).asString();
 
-        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+            TxTypeCancel tx
+                    = TxTypeCancel.createTransaction(nonce, gasPrice, gasLimit, from);
 
-        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
-        String from = ((RlpString) values.get(3)).asString();
+            tx.addSignatureData(values, 4);
 
-        TxTypeCancel tx
-                = TxTypeCancel.createTransaction(nonce, gasPrice, gasLimit, from);
-
-        tx.addSignatureData(values, 4);
-
-        return tx;
+            return tx;
+        } catch (Exception e) {
+            throw new RuntimeException("Incorrectly encoded tx.");
+        }
     }
-
+    /**
+     * @param rawTransaction RLP-encoded signed transaction from sender
+     * @return TxTypeCancel decoded transaction
+     */
     public static TxTypeCancel decodeFromRawTransaction(String rawTransaction) {
         return decodeFromRawTransaction(Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(rawTransaction)));
     }

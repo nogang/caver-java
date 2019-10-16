@@ -43,6 +43,43 @@ public class TxTypeValueTransfer extends AbstractTxType {
     }
 
     /**
+     * decode transaction hash from sender to reconstruct transaction with fee payer signature.
+     *
+     * @param rawTransaction RLP-encoded signed transaction from sender
+     * @return TxTypeValueTransfer decoded transaction
+     */
+    public static TxTypeValueTransfer decodeFromRawTransaction(byte[] rawTransaction) {
+        // TxHashRLP = type + encode([nonce, gasPrice, gas, to, value, from, txSignatures])
+        try {
+            byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+            RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
+            List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+
+            BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+            BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+            BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+            String to = ((RlpString) values.get(3)).asString();
+            BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
+            String from = ((RlpString) values.get(5)).asString();
+
+            TxTypeValueTransfer tx
+                    = TxTypeValueTransfer.createTransaction(nonce, gasPrice, gasLimit, to, value, from);
+            tx.addSignatureData(values, 6);
+            return tx;
+        } catch (Exception e) {
+            throw new RuntimeException("Incorrectly encoded tx.");
+        }
+    }
+
+    /**
+     * @param rawTransaction RLP-encoded signed transaction from sender
+     * @return TxTypeValueTransfer decoded transaction
+     */
+    public static TxTypeValueTransfer decodeFromRawTransaction(String rawTransaction) {
+        return decodeFromRawTransaction(Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(rawTransaction)));
+    }
+
+    /**
      * This method is overridden as VALUE_TRANSFER type.
      * The return value is used for rlp encoding.
      *
@@ -66,31 +103,6 @@ public class TxTypeValueTransfer extends AbstractTxType {
         result.add(RlpString.create(getValue()));
         result.add(RlpString.create(Numeric.hexStringToByteArray(getFrom())));
         return result;
-    }
-
-    public static TxTypeValueTransfer decodeFromRawTransaction(byte[] rawTransaction) {
-        byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
-        //TxHashRLP = type + encode([nonce, gasPrice, gas, to, value, from, txSignatures, feePayer, feePayerSignatures])
-        RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
-        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
-        String to = ((RlpString) values.get(3)).asString();
-        BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
-        String from = ((RlpString) values.get(5)).asString();
-        TxTypeValueTransfer tx
-                = TxTypeValueTransfer.createTransaction(nonce, gasPrice, gasLimit, to, value, from);
-        tx.addSignatureData(values, 6);
-        return tx;
-    }
-
-    /**
-     * @param rawTransaction signed transaction hash from sender
-     * @return TxTypeFeeDelegatedValueTransfer decoded transaction
-     */
-    public static TxTypeValueTransfer decodeFromRawTransaction(String rawTransaction) {
-        return decodeFromRawTransaction(Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(rawTransaction)));
     }
 
 }

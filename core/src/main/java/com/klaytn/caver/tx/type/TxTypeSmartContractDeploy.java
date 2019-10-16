@@ -92,29 +92,41 @@ public class TxTypeSmartContractDeploy extends AbstractTxType {
         return Type.SMART_CONTRACT_DEPLOY;
     }
 
+    /**
+     * decode transaction hash from sender to reconstruct transaction with fee payer signature.
+     *
+     * @param rawTransaction RLP-encoded signed transaction from sender
+     * @return TxTypeSmartContractDeploy decoded transaction
+     */
     public static TxTypeSmartContractDeploy decodeFromRawTransaction(byte[] rawTransaction) {
-        //TxHashRLP = type + encode([nonce, gasPrice, gas, to, value, from, input, humanReadable, codeFormat, txSignatures])
-        //TxHashRLP = type + encode([nonce, gasPrice, gas, to, value, from, input, humanReadable, codeFormat, txSignatures, feePayer, feePayerSignatures])
-        //TxHashRLP = type + encode([nonce, gasPrice, gas, to, value, from, input, humanReadable, feeRatio, codeFormat, txSignatures, feePayer, feePayerSignatures])
-        byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+        // TxHashRLP = type + encode([nonce, gasPrice, gas, to, value, from, input, humanReadable, codeFormat, txSignatures])
+        try {
+            byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+            RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
+            List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
 
-        RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
-        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
-        //String to = ((RlpString) values.get(3)).asString();
-        BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
-        String from = ((RlpString) values.get(5)).asString();
-        byte[] payload = ((RlpString) values.get(6)).getBytes();
-        BigInteger codeFormat = ((RlpString) values.get(8)).asPositiveBigInteger();
+            BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+            BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+            BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+            //String to = ((RlpString) values.get(3)).asString();
+            BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
+            String from = ((RlpString) values.get(5)).asString();
+            byte[] payload = ((RlpString) values.get(6)).getBytes();
+            BigInteger codeFormat = ((RlpString) values.get(8)).asPositiveBigInteger();
 
-        TxTypeSmartContractDeploy tx
-                = new TxTypeSmartContractDeploy(nonce, gasPrice, gasLimit, value, from, payload, codeFormat);
-        tx.addSignatureData(values, 9);
-        return tx;
+            TxTypeSmartContractDeploy tx
+                    = new TxTypeSmartContractDeploy(nonce, gasPrice, gasLimit, value, from, payload, codeFormat);
+            tx.addSignatureData(values, 9);
+            return tx;
+        } catch (Exception e) {
+            throw new RuntimeException("Incorrectly encoded tx.");
+        }
     }
 
+    /**
+     * @param rawTransaction RLP-encoded signed transaction from sender
+     * @return TxTypeSmartContractDeploy decoded transaction
+     */
     public static TxTypeSmartContractDeploy decodeFromRawTransaction(String rawTransaction) {
         return decodeFromRawTransaction(Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(rawTransaction)));
     }

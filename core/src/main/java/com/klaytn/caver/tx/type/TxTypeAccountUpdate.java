@@ -79,27 +79,39 @@ public class TxTypeAccountUpdate extends AbstractTxType {
         return Type.ACCOUNT_UPDATE;
     }
 
+    /**
+     * decode transaction hash from sender to reconstruct transaction with fee payer signature.
+     *
+     * @param rawTransaction RLP-encoded signed transaction from sender
+     * @return TxTypeAccountUpdate decoded transaction
+     */
     public static TxTypeAccountUpdate decodeFromRawTransaction(byte[] rawTransaction) {
         //TxHashRLP = type + encode([nonce, gasPrice, gas, from, rlpEncodedKey, txSignatures])
-        byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+        try {
+            byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+            RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
+            List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
 
-        RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+            BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+            BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+            BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+            String from = ((RlpString) values.get(3)).asString();
+            String rawAccountKey = ((RlpString) values.get(4)).asString();
 
-        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+            TxTypeAccountUpdate tx
+                    = TxTypeAccountUpdate.createTransaction(nonce, gasPrice, gasLimit, from, AccountKeyDecoder.fromRlp(rawAccountKey));
 
-        String from = ((RlpString) values.get(3)).asString();
-        String rawAccountKey = ((RlpString) values.get(4)).asString();
-
-        TxTypeAccountUpdate tx
-                = TxTypeAccountUpdate.createTransaction(nonce, gasPrice, gasLimit, from, AccountKeyDecoder.fromRlp(rawAccountKey));
-
-        tx.addSignatureData(values, 5);
-        return tx;
+            tx.addSignatureData(values, 5);
+            return tx;
+        } catch (Exception e) {
+            throw new RuntimeException("Incorrectly encoded tx.");
+        }
     }
 
+    /**
+     * @param rawTransaction RLP-encoded signed transaction from sender
+     * @return TxTypeAccountUpdate decoded transaction
+     */
     public static TxTypeAccountUpdate decodeFromRawTransaction(String rawTransaction) {
         return decodeFromRawTransaction(Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(rawTransaction)));
     }
