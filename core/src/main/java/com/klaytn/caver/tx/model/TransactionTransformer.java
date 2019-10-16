@@ -16,6 +16,7 @@
 
 package com.klaytn.caver.tx.model;
 
+import com.klaytn.caver.tx.ValueTransfer;
 import com.klaytn.caver.tx.exception.UnsupportedTxTypeException;
 import com.klaytn.caver.tx.type.TxType;
 import com.klaytn.caver.utils.Convert;
@@ -28,6 +29,7 @@ public abstract class TransactionTransformer<T extends TransactionTransformer> {
     private String from;
     private BigInteger gasPrice = Convert.toPeb("25", Convert.Unit.STON).toBigInteger();
     private BigInteger gasLimit;
+    protected boolean feeDelegate;
 
     public T from(String from) {
         this.from = from;
@@ -64,6 +66,11 @@ public abstract class TransactionTransformer<T extends TransactionTransformer> {
 
     public String getFrom() {
         return from;
+    }
+
+    public T feeDelegate() {
+        this.feeDelegate = true;
+        return (T) this;
     }
 
     public BigInteger getGasLimit() {

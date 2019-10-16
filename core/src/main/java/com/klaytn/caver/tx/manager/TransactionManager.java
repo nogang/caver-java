@@ -22,6 +22,7 @@ package com.klaytn.caver.tx.manager;
 
 import com.klaytn.caver.Caver;
 import com.klaytn.caver.crypto.KlayCredentials;
+import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.methods.response.Bytes32;
 import com.klaytn.caver.methods.response.KlayTransactionReceipt;
 import com.klaytn.caver.tx.model.TransactionTransformer;
@@ -29,12 +30,17 @@ import com.klaytn.caver.tx.exception.EmptyNonceException;
 import com.klaytn.caver.tx.exception.PlatformErrorException;
 import com.klaytn.caver.tx.exception.UnsupportedTxTypeException;
 import com.klaytn.caver.tx.model.KlayRawTransaction;
+import com.klaytn.caver.tx.type.AbstractTxType;
+import com.klaytn.caver.tx.type.TxType;
 import com.klaytn.caver.utils.ChainId;
+import com.klaytn.caver.utils.TransactionDecoder;
 import com.klaytn.caver.wallet.WalletManager;
 import com.klaytn.caver.wallet.exception.CredentialNotFoundException;
+import org.web3j.crypto.Sign;
 import org.web3j.protocol.exceptions.TransactionException;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 public class TransactionManager {
 
@@ -67,6 +73,72 @@ public class TransactionManager {
         return receipt;
     }
 
+    public KlayTransactionReceipt.TransactionReceipt executeTransaction(
+            AbstractTxType txType) {
+        KlayTransactionReceipt.TransactionReceipt receipt = null;
+        KlayRawTransaction rawTx = sign(txType);
+        try {
+            String transactionHash = send(rawTx);
+            receipt = transactionReceiptProcessor.waitForTransactionReceipt(transactionHash);
+        } catch (TransactionException | PlatformErrorException | IOException e) {
+            exception(e);
+        }
+        return receipt;
+    }
+
+    public KlayTransactionReceipt.TransactionReceipt executeTransaction(
+            String rawTransaction) {
+
+        AbstractTxType txType = TransactionDecoder.decode(rawTransaction);
+        return executeTransaction(txType);
+    }
+
+    public KlaySignatureData makeSignatureData(AbstractTxType txType) {
+        KlaySignatureData result = null;
+
+        try {
+            KlayCredentials credentials = walletManager.findByAddress(txType.getFrom());
+
+            result = txType.getSignatureData(credentials, this.chainId);
+        } catch (CredentialNotFoundException | EmptyNonceException e) {
+            exception(e);
+        }
+        return result;
+    }
+
+    public KlaySignatureData makeSignatureData(TransactionTransformer transactionTransformer) {
+        KlaySignatureData result = null;
+
+        try {
+            KlayCredentials credentials = walletManager.findByAddress(transactionTransformer.getFrom());
+
+            if (transactionTransformer.getNonce() == null) {
+                transactionTransformer.nonce(getNonceProcessor.getNonce(credentials));
+            }
+
+            result = transactionTransformer.build().getSignatureData(credentials, this.chainId);
+        } catch (UnsupportedTxTypeException | CredentialNotFoundException | IOException | EmptyNonceException e) {
+            exception(e);
+        }
+        return result;
+    }
+
+    public KlayRawTransaction sign(AbstractTxType txType) {
+        KlayRawTransaction result = null;
+        try {
+            KlayCredentials credentials = walletManager.findByAddress(txType.getFrom());
+            result = txType.sign(credentials, this.chainId);
+        } catch (CredentialNotFoundException | EmptyNonceException e) {
+            exception(e);
+        }
+        return result;
+    }
+
+    public KlayRawTransaction sign(String klayRawTransaction) {
+        AbstractTxType txType = TransactionDecoder.decode(klayRawTransaction);
+        return sign(txType);
+    }
+
     public KlayRawTransaction sign(TransactionTransformer transactionTransformer) {
         return sign(transactionTransformer, false);
     }
@@ -77,7 +149,9 @@ public class TransactionManager {
             KlayCredentials credentials = walletManager.findByAddress(transactionTransformer.getFrom());
 
             if (transactionTransformer.getNonce() == null) {
-                transactionTransformer.nonce(getNonceProcessor.getNonce(credentials));
+                BigInteger nonce = getNonceProcessor.getNonce(credentials);
+                System.out.println(nonce);
+                transactionTransformer.nonce(nonce);
             }
 
             result = transactionTransformer.build(isFeeDelegated).sign(credentials, this.chainId);

@@ -16,7 +16,6 @@
 
 package com.klaytn.caver.tx.type;
 
-import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.utils.KlayTransactionUtils;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
@@ -30,7 +29,7 @@ import java.util.List;
 /**
  * TxTypeFeeDelegatedValueTransferWithRatio is a value transfer transaction with a fee payer and its ratio.
  */
-public class TxTypeFeeDelegatedValueTransferWithRatio extends AbstractTxType implements TxTypeFeeDelegate {
+public class TxTypeFeeDelegatedValueTransferWithRatio extends TxTypeFeeDelegate {
 
     /**
      * Fee ratio of the fee payer. If it is 30, 30% of the fee will be paid by the fee payer.
@@ -90,23 +89,17 @@ public class TxTypeFeeDelegatedValueTransferWithRatio extends AbstractTxType imp
         byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
         RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        RlpList values = (RlpList) rlpList.getValues().get(0);
-        BigInteger nonce = ((RlpString) values.getValues().get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.getValues().get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.getValues().get(2)).asPositiveBigInteger();
-        String to = ((RlpString) values.getValues().get(3)).asString();
-        BigInteger value = ((RlpString) values.getValues().get(4)).asPositiveBigInteger();
-        String from = ((RlpString) values.getValues().get(5)).asString();
-        BigInteger feeRatio = ((RlpString) values.getValues().get(6)).asPositiveBigInteger();
+        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+        String to = ((RlpString) values.get(3)).asString();
+        BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
+        String from = ((RlpString) values.get(5)).asString();
+        BigInteger feeRatio = ((RlpString) values.get(6)).asPositiveBigInteger();
         TxTypeFeeDelegatedValueTransferWithRatio tx
                 = TxTypeFeeDelegatedValueTransferWithRatio.createTransaction(nonce, gasPrice, gasLimit, to, value, from, feeRatio);
-        if (values.getValues().size() > 6) {
-            RlpList vrs = (RlpList) ((RlpList) (values.getValues().get(7))).getValues().get(0);
-            byte[] v = ((RlpString) vrs.getValues().get(0)).getBytes();
-            byte[] r = ((RlpString) vrs.getValues().get(1)).getBytes();
-            byte[] s = ((RlpString) vrs.getValues().get(2)).getBytes();
-            tx.setSenderSignatureData(new KlaySignatureData(v, r, s));
-        }
+        tx.addSignatureData(values, 7);
         return tx;
     }
 

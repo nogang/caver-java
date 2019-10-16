@@ -16,7 +16,6 @@
 
 package com.klaytn.caver.tx.type;
 
-import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.utils.KlayTransactionUtils;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
@@ -86,25 +85,20 @@ public class TxTypeChainDataAnchoringTransaction extends AbstractTxType {
      * @return TxTypeChainDataAnchoringTransaction decoded transaction
      */
     public static TxTypeChainDataAnchoringTransaction decodeFromRawTransaction(byte[] rawTransaction) {
+        //TxHashRLP = type + encode([nonce, gasPrice, gas, from, anchoredData, txSignatures])
         byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
         RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        RlpList values = (RlpList) rlpList.getValues().get(0);
-        BigInteger nonce = ((RlpString) values.getValues().get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.getValues().get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.getValues().get(2)).asPositiveBigInteger();
-        String from = ((RlpString) values.getValues().get(3)).asString();
-        byte[] payload = ((RlpString) values.getValues().get(4)).getBytes();
+        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+        String from = ((RlpString) values.get(3)).asString();
+        byte[] payload = ((RlpString) values.get(4)).getBytes();
 
         TxTypeChainDataAnchoringTransaction tx
                 = new TxTypeChainDataAnchoringTransaction(nonce, gasPrice, gasLimit, from, payload);
-        if (values.getValues().size() > 4) {
-            RlpList vrs = (RlpList) ((RlpList) (values.getValues().get(5))).getValues().get(0);
-            byte[] v = ((RlpString) vrs.getValues().get(0)).getBytes();
-            byte[] r = ((RlpString) vrs.getValues().get(1)).getBytes();
-            byte[] s = ((RlpString) vrs.getValues().get(2)).getBytes();
-            tx.setSenderSignatureData(new KlaySignatureData(v, r, s));
-        }
+        tx.addSignatureData(values, 5);
         return tx;
     }
 

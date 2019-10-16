@@ -20,6 +20,7 @@ import com.klaytn.caver.crypto.KlayCredentials;
 import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.tx.model.KlayRawTransaction;
 import org.web3j.rlp.RlpType;
+import org.web3j.utils.Numeric;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ public interface TxType {
      * @return Type transaction type
      */
     Type getType();
-
+    void addSignatureData(List<RlpType> values, int offset);
     /**
      * create rlp encoded value for signature component
      *

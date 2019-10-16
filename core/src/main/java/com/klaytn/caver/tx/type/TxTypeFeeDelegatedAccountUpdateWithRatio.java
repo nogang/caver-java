@@ -16,24 +16,26 @@
 
 package com.klaytn.caver.tx.type;
 
+import com.klaytn.caver.crypto.KlayCredentials;
 import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.tx.account.AccountKey;
 import com.klaytn.caver.tx.account.AccountKeyDecoder;
+import com.klaytn.caver.utils.KlaySignatureDataUtils;
 import com.klaytn.caver.utils.KlayTransactionUtils;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Sign;
+import org.web3j.rlp.*;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * TxTypeFeeDelegatedAccountUpdateWithRatio updates the key of the account.
  * The given ratio of the transaction fee is paid by the fee payer.
  */
-public class TxTypeFeeDelegatedAccountUpdateWithRatio extends AbstractTxType implements TxTypeFeeDelegate {
+public class TxTypeFeeDelegatedAccountUpdateWithRatio extends TxTypeFeeDelegate {
 
     /**
      * newly created accountKey
@@ -100,24 +102,19 @@ public class TxTypeFeeDelegatedAccountUpdateWithRatio extends AbstractTxType imp
         byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
         RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        RlpList values = (RlpList) rlpList.getValues().get(0);
+        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
 
-        BigInteger nonce = ((RlpString) values.getValues().get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.getValues().get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.getValues().get(2)).asPositiveBigInteger();
-        String from = ((RlpString) values.getValues().get(3)).asString();
-        String accountkeyRaw = ((RlpString) values.getValues().get(4)).asString();
-        BigInteger feeRatio = ((RlpString) values.getValues().get(5)).asPositiveBigInteger();
+        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+        String from = ((RlpString) values.get(3)).asString();
+        String accountkeyRaw = ((RlpString) values.get(4)).asString();
+        BigInteger feeRatio = ((RlpString) values.get(5)).asPositiveBigInteger();
 
         TxTypeFeeDelegatedAccountUpdateWithRatio tx
                 = TxTypeFeeDelegatedAccountUpdateWithRatio.createTransaction(nonce, gasPrice, gasLimit, from, AccountKeyDecoder.fromRlp(accountkeyRaw), feeRatio);
-        if (values.getValues().size() > 5) {
-            RlpList vrs = (RlpList) ((RlpList) (values.getValues().get(6))).getValues().get(0);
-            byte[] v = ((RlpString) vrs.getValues().get(0)).getBytes();
-            byte[] r = ((RlpString) vrs.getValues().get(1)).getBytes();
-            byte[] s = ((RlpString) vrs.getValues().get(2)).getBytes();
-            tx.setSenderSignatureData(new KlaySignatureData(v, r, s));
-        }
+
+        tx.addSignatureData(values, 6);
         return tx;
     }
 
@@ -127,5 +124,9 @@ public class TxTypeFeeDelegatedAccountUpdateWithRatio extends AbstractTxType imp
      */
     public static TxTypeFeeDelegatedAccountUpdateWithRatio decodeFromRawTransaction(String rawTransaction) {
         return decodeFromRawTransaction(Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(rawTransaction)));
+    }
+
+    protected List<ECKeyPair> getEcKeyPairsForSenderSign(KlayCredentials credentials) {
+        return credentials.getEcKeyPairsForUpdateList();
     }
 }

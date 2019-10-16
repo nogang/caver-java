@@ -42,6 +42,10 @@ public class CancelTransaction extends TransactionTransformer<CancelTransaction>
 
     @Override
     public TxType build() {
+        if (feeDelegate) {
+            return buildFeeDelegated();
+        }
+
         return TxTypeCancel.createTransaction(getNonce(), getGasPrice(), getGasLimit(), getFrom());
     }
 

@@ -16,7 +16,6 @@
 
 package com.klaytn.caver.tx.type;
 
-import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.utils.KlayTransactionUtils;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
@@ -31,7 +30,7 @@ import java.util.List;
  * TxTypeFeeDelegatedValueTransferMemo transfers KLAY with a data.
  * The fee is paid by the fee payer.
  */
-public class TxTypeFeeDelegatedValueTransferMemo extends AbstractTxType implements TxTypeFeeDelegate {
+public class TxTypeFeeDelegatedValueTransferMemo extends TxTypeFeeDelegate {
 
     /**
      * memo
@@ -88,23 +87,17 @@ public class TxTypeFeeDelegatedValueTransferMemo extends AbstractTxType implemen
         byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
         RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        RlpList values = (RlpList) rlpList.getValues().get(0);
-        BigInteger nonce = ((RlpString) values.getValues().get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.getValues().get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.getValues().get(2)).asPositiveBigInteger();
-        String to = ((RlpString) values.getValues().get(3)).asString();
-        BigInteger value = ((RlpString) values.getValues().get(4)).asPositiveBigInteger();
-        String from = ((RlpString) values.getValues().get(5)).asString();
-        byte[] payload = ((RlpString) values.getValues().get(6)).getBytes();
+        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+        String to = ((RlpString) values.get(3)).asString();
+        BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
+        String from = ((RlpString) values.get(5)).asString();
+        byte[] payload = ((RlpString) values.get(6)).getBytes();
         TxTypeFeeDelegatedValueTransferMemo tx
                 = TxTypeFeeDelegatedValueTransferMemo.createTransaction(nonce, gasPrice, gasLimit, to, value, from, payload);
-        if (values.getValues().size() > 6) {
-            RlpList vrs = (RlpList) ((RlpList) (values.getValues().get(7))).getValues().get(0);
-            byte[] v = ((RlpString) vrs.getValues().get(0)).getBytes();
-            byte[] r = ((RlpString) vrs.getValues().get(1)).getBytes();
-            byte[] s = ((RlpString) vrs.getValues().get(2)).getBytes();
-            tx.setSenderSignatureData(new KlaySignatureData(v, r, s));
-        }
+        tx.addSignatureData(values, 7);
         return tx;
     }
 

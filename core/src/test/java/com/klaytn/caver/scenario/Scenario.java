@@ -25,18 +25,29 @@ import com.klaytn.caver.crypto.KlayCredentials;
 import com.klaytn.caver.fee.FeePayerManager;
 import com.klaytn.caver.methods.response.Bytes32;
 import com.klaytn.caver.methods.response.KlayTransactionReceipt;
+import com.klaytn.caver.tx.ValueTransfer;
+import com.klaytn.caver.tx.account.AccountKeyPublic;
+import com.klaytn.caver.tx.account.AccountKeyWeightedMultiSig;
 import com.klaytn.caver.tx.type.TxType;
 import com.klaytn.caver.utils.Convert;
 import org.junit.Before;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.Response;
 import org.web3j.tx.gas.StaticGasProvider;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
+import static com.klaytn.caver.base.Accounts.BRANDON;
 import static com.klaytn.caver.base.LocalValues.LOCAL_CHAIN_ID;
 import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Common methods & settings used across scenarios
@@ -116,5 +127,60 @@ public class Scenario {
         Response<KlayTransactionReceipt.TransactionReceipt> transactionReceipt =
                 caver.klay().getTransactionReceipt(transactionHash).sendAsync().get();
         return Optional.ofNullable(transactionReceipt.getResult());
+    }
+
+    protected List<ECKeyPair> createECKeyPairList(int size) throws Exception{
+        List<ECKeyPair> ecKeyPairList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            ecKeyPairList.add(Keys.createEcKeyPair());
+        }
+
+        return ecKeyPairList;
+    }
+
+    protected void chargeAccount(String address) throws Exception{
+        KlayTransactionReceipt.TransactionReceipt transactionReceipt = ValueTransfer.create(caver, BRANDON, LOCAL_CHAIN_ID).sendFunds(
+                BRANDON.getAddress(),
+                address,
+                BigDecimal.valueOf(1),
+                Convert.Unit.KLAY, GAS_LIMIT
+        ).send();
+
+        assertEquals("0x1", transactionReceipt.getStatus());
+    }
+
+    protected KlayCredentials createAccount() throws Exception{
+        KlayCredentials user = KlayCredentials.create(Keys.createEcKeyPair());
+        chargeAccount(user.getAddress());
+        return user;
+    }
+
+    protected KlayCredentials createAccount(KlayCredentials oldCredentials) throws Exception{
+        ECKeyPair ecKeyPair = Keys.createEcKeyPair();
+        KlayCredentials user = KlayCredentials.create(ecKeyPair.getPrivateKey().toString(16),oldCredentials.getAddress());
+        chargeAccount(user.getAddress());
+        return user;
+    }
+
+    protected AccountKeyWeightedMultiSig createRandomAccountKeyWeightedMultiSig(List<ECKeyPair> ecKeyPairList) throws Exception{
+        Random random = new Random();
+        List<AccountKeyWeightedMultiSig.WeightedPublicKey> weightedTransactionPublicKeys = new ArrayList<>();
+        int sumOfWeight = 0;
+        for (ECKeyPair ecKeyPair : ecKeyPairList) {
+            int weight = random.nextInt(20) + 1;
+            sumOfWeight += weight;
+            AccountKeyWeightedMultiSig.WeightedPublicKey key = AccountKeyWeightedMultiSig.WeightedPublicKey.create(
+                    BigInteger.valueOf(weight),
+                    AccountKeyPublic.create(ecKeyPair.getPublicKey())
+            );
+            weightedTransactionPublicKeys.add(key);
+        }
+
+        AccountKeyWeightedMultiSig newAccountKey = AccountKeyWeightedMultiSig.create(
+                BigInteger.valueOf(random.nextInt(sumOfWeight) + 1),
+                weightedTransactionPublicKeys
+        );
+
+        return newAccountKey;
     }
 }

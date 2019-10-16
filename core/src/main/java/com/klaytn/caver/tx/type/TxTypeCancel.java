@@ -16,6 +16,9 @@
 
 package com.klaytn.caver.tx.type;
 
+import com.klaytn.caver.utils.KlayTransactionUtils;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
@@ -59,6 +62,31 @@ public class TxTypeCancel extends AbstractTxType {
     @Override
     public TxType.Type getType() {
         return Type.CANCEL;
+    }
+
+    public static TxTypeCancel decodeFromRawTransaction(byte[] rawTransaction) {
+        int parsingIndex = 0;
+        byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+
+        RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
+        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+
+        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+
+        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+        String from = ((RlpString) values.get(3)).asString();
+
+        TxTypeCancel tx
+                = TxTypeCancel.createTransaction(nonce, gasPrice, gasLimit, from);
+
+        tx.addSignatureData(values, 4);
+
+        return tx;
+    }
+
+    public static TxTypeCancel decodeFromRawTransaction(String rawTransaction) {
+        return decodeFromRawTransaction(Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(rawTransaction)));
     }
 
 }

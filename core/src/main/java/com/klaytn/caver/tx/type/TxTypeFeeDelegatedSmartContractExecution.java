@@ -16,7 +16,6 @@
 
 package com.klaytn.caver.tx.type;
 
-import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.utils.KlayTransactionUtils;
 import org.web3j.rlp.*;
 import org.web3j.utils.Numeric;
@@ -28,7 +27,7 @@ import java.util.List;
  * TxTypeFeeDelegatedSmartContractExecution executes a smart contract with the given data.
  * The fee is paid by the fee payer.
  */
-public class TxTypeFeeDelegatedSmartContractExecution extends AbstractTxType implements TxTypeFeeDelegate {
+public class TxTypeFeeDelegatedSmartContractExecution extends TxTypeFeeDelegate {
 
     /**
      * input data of the smart contract
@@ -89,24 +88,18 @@ public class TxTypeFeeDelegatedSmartContractExecution extends AbstractTxType imp
         byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
         RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        RlpList values = (RlpList) rlpList.getValues().get(0);
-        BigInteger nonce = ((RlpString) values.getValues().get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.getValues().get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.getValues().get(2)).asPositiveBigInteger();
-        String to = ((RlpString) values.getValues().get(3)).asString();
-        BigInteger value = ((RlpString) values.getValues().get(4)).asPositiveBigInteger();
-        String from = ((RlpString) values.getValues().get(5)).asString();
-        byte[] payload = ((RlpString) values.getValues().get(6)).getBytes();
+        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+        String to = ((RlpString) values.get(3)).asString();
+        BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
+        String from = ((RlpString) values.get(5)).asString();
+        byte[] payload = ((RlpString) values.get(6)).getBytes();
 
         TxTypeFeeDelegatedSmartContractExecution tx
                 = TxTypeFeeDelegatedSmartContractExecution.createTransaction(nonce, gasPrice, gasLimit, to, value, from, payload);
-        if (values.getValues().size() > 6) {
-            RlpList vrs = (RlpList) ((RlpList) (values.getValues().get(7))).getValues().get(0);
-            byte[] v = ((RlpString) vrs.getValues().get(0)).getBytes();
-            byte[] r = ((RlpString) vrs.getValues().get(1)).getBytes();
-            byte[] s = ((RlpString) vrs.getValues().get(2)).getBytes();
-            tx.setSenderSignatureData(new KlaySignatureData(v, r, s));
-        }
+        tx.addSignatureData(values, 7);
         return tx;
     }
 
