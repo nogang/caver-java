@@ -46,7 +46,7 @@ public class FeePayer {
     }
 
     public KlayRawTransaction sign(TxTypeFeeDelegate txType) {
-        Set<KlaySignatureData> feePayerSignatureDataSet = getFeePayerSignatureDataList(txType);
+        Set<KlaySignatureData> feePayerSignatureDataSet = getFeePayerSignatureData(txType);
 
         List<RlpType> rlpTypeList = new ArrayList<>(txType.rlpValues());
         List<RlpType> senderSignatureList = new ArrayList<>();
@@ -90,23 +90,25 @@ public class FeePayer {
         return KlaySignatureDataUtils.createEip155KlaySignatureData(signedSignatureData, chainId);
     }
 
-    public Set<KlaySignatureData> getFeePayerSignatureDataList(AbstractTxType txType) {
+    /**
+     * extract signature data of fee payer signed in TxType
+     *
+     * @param txType txType to extract fee payer's signature data
+     * @return Set fee payer's signature data
+     */
+    private Set<KlaySignatureData> getFeePayerSignatureData(AbstractTxType txType) {
         KlaySignatureData signatureData = KlaySignatureData.createKlaySignatureDataFromChainId(chainId);
         Set<KlaySignatureData> feePayerSignatureDataSet = new HashSet<>();
-        byte[] encodedTransaction = txType.getEncodedTransactionNoSig();
+        byte[] encodedTransactionNoSig = txType.getEncodedTransactionNoSig();
 
         List<RlpType> rlpTypeList = new ArrayList<>();
-        rlpTypeList.add(RlpString.create(encodedTransaction));
+        rlpTypeList.add(RlpString.create(encodedTransactionNoSig));
         rlpTypeList.add(RlpString.create(Numeric.hexStringToByteArray(credentials.getAddress())));
         rlpTypeList.addAll(signatureData.toRlpList().getValues());
-        byte[] encodedTransaction2 = RlpEncoder.encode(new RlpList(rlpTypeList));
-
-        for (RlpType rlpType : rlpTypeList) {
-            System.out.println(((RlpString) rlpType).getBytes());
-        }
+        byte[] encodedTransaction = RlpEncoder.encode(new RlpList(rlpTypeList));
 
         for (ECKeyPair ecKeyPair : credentials.getEcKeyPairsForFeePayerList()) {
-            Sign.SignatureData signedSignatureData = Sign.signMessage(encodedTransaction2, ecKeyPair);
+            Sign.SignatureData signedSignatureData = Sign.signMessage(encodedTransaction, ecKeyPair);
             feePayerSignatureDataSet.add(KlaySignatureDataUtils.createEip155KlaySignatureData(signedSignatureData, chainId));
         }
 
