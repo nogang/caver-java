@@ -20,7 +20,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (String address) -> ValueTransferTransaction.create(address, BRANDON.getAddress(), BigInteger.ONE, GAS_LIMIT),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                });
+                }, false);
     }
     @Test
     public void valueTransferMemoTest() throws Exception{
@@ -29,7 +29,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
-                });
+                }, false);
     }
 
     //////////////////////////////// FeeDelegateTest - value Transfer ////////////////////////////////
@@ -39,7 +39,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (String address) -> ValueTransferTransaction.create(address, BRANDON.getAddress(), BigInteger.ONE, GAS_LIMIT).feeDelegate(),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                });
+                }, false);
     }
     @Test
     public void feeDelegatedValueTransferMemoTest() throws Exception{
@@ -48,7 +48,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
-                });
+                }, false);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
-                });
+                }, false);
     }
     @Test
     public void feeDelegatedValueTransferWithRatio() throws Exception{
@@ -72,7 +72,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
-                });
+                }, false);
     }
     //////////////////////////////// MultiTransactionSignerTest - value Transfer ////////////////////////////////
     @Test
@@ -81,7 +81,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (String address) -> ValueTransferTransaction.create(address, BRANDON.getAddress(), BigInteger.ONE, GAS_LIMIT).feeDelegate(),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                });
+                }, false);
     }
     @Test
     public void feeDelegatedValueTransferMemoMultiTransactionSignerTest() throws Exception{
@@ -90,7 +90,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
-                });
+                }, false);
     }
 
     @Test
@@ -103,7 +103,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
-                });
+                }, false);
     }
     @Test
     public void feeDelegatedValueTransferWithRatioMultiTransactionSignerTest() throws Exception{
@@ -114,7 +114,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexStringWithPrefixSafe(feeRatio), transactionReceipt.getFeeRatio());
-                });
+                }, false);
     }
 
     //////////////////////////////// MultiFeePayerTest - value Transfer ////////////////////////////////
@@ -124,7 +124,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (String address) -> ValueTransferTransaction.create(address, BRANDON.getAddress(), BigInteger.ONE, GAS_LIMIT).feeDelegate(),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                });
+                }, false);
     }
     @Test
     public void feeDelegatedValueTransferMemoMultiFeePayerTest() throws Exception{
@@ -133,7 +133,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
-                });
+                }, false);
     }
 
     @Test
@@ -146,7 +146,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
-                });
+                }, false);
     }
     @Test
     public void feeDelegatedValueTransferWithRatioMultiFeePayerTest() throws Exception{
@@ -157,7 +157,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
-                });
+                }, false);
     }
 
     //////////////////////////////// MultiSignerMultiFeePayerTest - value Transfer ////////////////////////////////
@@ -167,7 +167,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (String address) -> ValueTransferTransaction.create(address, BRANDON.getAddress(), BigInteger.ONE, GAS_LIMIT).feeDelegate(),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                });
+                }, false);
     }
     @Test
     public void feeDelegatedValueTransferMemoMultiTransactionSignerMultiFeePayerTest() throws Exception{
@@ -176,7 +176,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
-                });
+                }, false);
     }
 
     @Test
@@ -189,7 +189,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
-                });
+                }, false);
     }
     @Test
     public void feeDelegatedValueTransferWithRatioMultiTransactionSignerMultiFeePayerTest() throws Exception{
@@ -200,6 +200,6 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
-                });
+                }, false);
     }
 }

@@ -13,15 +13,15 @@ import java.util.List;
 import static com.klaytn.caver.base.LocalValues.LOCAL_CHAIN_ID;
 import static org.junit.Assert.assertEquals;
 
-public class RoleBasedIT extends Scenario{
+public class RoleBasedIT extends Scenario {
     protected final String MEMO = "Klaytn MemoTest 1234567890!";
 
-    protected void roleBasedTransactionTest(TransactionGetter transactionGetter,ReceiptChecker receiptChecker) throws Exception{
+    protected void roleBasedTransactionTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
-        roleBaseAccountGenerator.initTestSet(1,1,1);
-        List<KlayCredentials> transactionCredentialsList = roleBaseAccountGenerator.getTransactionAccountCredential();
+        roleBaseAccountGenerator.initTestSet(1, 1, 1);
+        List<KlayCredentials> senderCredentialsList = roleBaseAccountGenerator.getSenderCredentialForTest(isUpdateTest);
 
-        TransactionManager transactionManager = new TransactionManager.Builder(caver, transactionCredentialsList.get(0))
+        TransactionManager transactionManager = new TransactionManager.Builder(caver, senderCredentialsList.get(0))
                 .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
                 .setChaindId(LOCAL_CHAIN_ID)
                 .build();
@@ -31,19 +31,19 @@ public class RoleBasedIT extends Scenario{
         receiptChecker.check(transactionTransformer, transactionReceipt);
     }
 
-    protected void feeDelegatedRoleBasedMultiTransactionSignerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker) throws Exception{
+    protected void feeDelegatedRoleBasedMultiTransactionSignerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
         int transactionAccountSize = 10;
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
-        roleBaseAccountGenerator.initTestSet(transactionAccountSize,1,1);
-        List<KlayCredentials> transactionCredentialsList = roleBaseAccountGenerator.getTransactionAccountCredential();
+        roleBaseAccountGenerator.initTestSet(transactionAccountSize, 1, 1);
+        List<KlayCredentials> senderCredentialsList = roleBaseAccountGenerator.getSenderCredentialForTest(isUpdateTest);
         List<KlayCredentials> feePayerCredentialsList = roleBaseAccountGenerator.getFeePayerAccountCredential();
 
         KlayRawTransaction klayRawTransaction = null;
         KlayTransactionReceipt.TransactionReceipt transactionReceipt;
         TransactionTransformer transactionTransformer = null;
 
-        for (int i = 0 ; i < transactionAccountSize; i++) {
-            TransactionManager transactionManager = new TransactionManager.Builder(caver, transactionCredentialsList.get(i))
+        for (int i = 0; i < transactionAccountSize; i++) {
+            TransactionManager transactionManager = new TransactionManager.Builder(caver, senderCredentialsList.get(i))
                     .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
                     .setChaindId(LOCAL_CHAIN_ID)
                     .build();
@@ -64,22 +64,22 @@ public class RoleBasedIT extends Scenario{
                 .setChainId(LOCAL_CHAIN_ID)
                 .build();
 
-       transactionReceipt = feePayerManager.executeTransaction(klayRawTransaction.getValueAsString());
-       receiptChecker.check(transactionTransformer, transactionReceipt);
+        transactionReceipt = feePayerManager.executeTransaction(klayRawTransaction.getValueAsString());
+        receiptChecker.check(transactionTransformer, transactionReceipt);
     }
 
-    protected void feeDelegatedRoleBasedTransactionMultiFeePayerTest(TransactionGetter transactionGetter,ReceiptChecker receiptChecker) throws Exception{
+    protected void feeDelegatedRoleBasedTransactionMultiFeePayerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
         int feePayerAccountSize = 10;
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
-        roleBaseAccountGenerator.initTestSet(1,1,feePayerAccountSize);
-        List<KlayCredentials> transactionCredentialsList = roleBaseAccountGenerator.getTransactionAccountCredential();
+        roleBaseAccountGenerator.initTestSet(1, 1, feePayerAccountSize);
+        List<KlayCredentials> senderCredentialsList = roleBaseAccountGenerator.getSenderCredentialForTest(isUpdateTest);
         List<KlayCredentials> feePayerCredentialsList = roleBaseAccountGenerator.getFeePayerAccountCredential();
 
         KlayRawTransaction klayRawTransaction = null;
         KlayTransactionReceipt.TransactionReceipt transactionReceipt = null;
 
         // 1. The transaction constructor creates and signs a transaction.
-        TransactionManager transactionManager = new TransactionManager.Builder(caver, transactionCredentialsList.get(0))
+        TransactionManager transactionManager = new TransactionManager.Builder(caver, senderCredentialsList.get(0))
                 .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
                 .setChaindId(LOCAL_CHAIN_ID)
                 .build();
@@ -88,8 +88,8 @@ public class RoleBasedIT extends Scenario{
         klayRawTransaction = transactionManager.sign(transactionTransformer);
 
 
-        for (int i = 0 ; i < feePayerAccountSize; i++) {
-            if (i < feePayerAccountSize - 1){
+        for (int i = 0; i < feePayerAccountSize; i++) {
+            if (i < feePayerAccountSize - 1) {
                 // 2. Those with the RoleFeePayer key receive and sign the rawTransaction.
                 FeePayerManager feePayerManager = new FeePayerManager.Builder(caver, feePayerCredentialsList.get(i))
                         .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
@@ -110,20 +110,20 @@ public class RoleBasedIT extends Scenario{
     }
 
 
-    protected void feeDelegatedRoleBasedTransactionMultiTransactionSignerMultiFeePayerTest(TransactionGetter transactionGetter,ReceiptChecker receiptChecker) throws Exception{
+    protected void feeDelegatedRoleBasedTransactionMultiTransactionSignerMultiFeePayerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
         int transactionAccountSize = 10;
         int feePayerAccountSize = 10;
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
-        roleBaseAccountGenerator.initTestSet(transactionAccountSize,1,feePayerAccountSize);
-        List<KlayCredentials> transactionCredentialsList = roleBaseAccountGenerator.getTransactionAccountCredential();
+        roleBaseAccountGenerator.initTestSet(transactionAccountSize, 1, feePayerAccountSize);
+        List<KlayCredentials> senderCredentialsList = roleBaseAccountGenerator.getSenderCredentialForTest(isUpdateTest);
         List<KlayCredentials> feePayerCredentialsList = roleBaseAccountGenerator.getFeePayerAccountCredential();
 
         KlayRawTransaction klayRawTransaction = null;
         KlayTransactionReceipt.TransactionReceipt transactionReceipt = null;
         TransactionTransformer transactionTransformer = null;
 
-        for (int i = 0 ; i < transactionAccountSize; i++) {
-            TransactionManager transactionManager = new TransactionManager.Builder(caver, transactionCredentialsList.get(i))
+        for (int i = 0; i < transactionAccountSize; i++) {
+            TransactionManager transactionManager = new TransactionManager.Builder(caver, senderCredentialsList.get(i))
                     .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
                     .setChaindId(LOCAL_CHAIN_ID)
                     .build();
@@ -138,13 +138,13 @@ public class RoleBasedIT extends Scenario{
             }
         }
 
-        for (int i = 0 ; i < feePayerAccountSize; i++) {
+        for (int i = 0; i < feePayerAccountSize; i++) {
             FeePayerManager feePayerManager = new FeePayerManager.Builder(caver, feePayerCredentialsList.get(i))
                     .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
                     .setChainId(LOCAL_CHAIN_ID)
                     .build();
 
-            if (i < feePayerAccountSize - 1){
+            if (i < feePayerAccountSize - 1) {
                 // 3. Those with the RoleFeePayer key receive and sign the rawTransaction.
                 klayRawTransaction = feePayerManager.sign(klayRawTransaction.getValueAsString());
             } else {
@@ -157,15 +157,14 @@ public class RoleBasedIT extends Scenario{
     }
 
 
-
-    protected void feeDelegatedRoleBasedTransactionTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker) throws Exception{
+    protected void feeDelegatedRoleBasedTransactionTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
-        roleBaseAccountGenerator.initTestSet(1,1,1);
-        List<KlayCredentials> transactionCredentialsList = roleBaseAccountGenerator.getTransactionAccountCredential();
+        roleBaseAccountGenerator.initTestSet(1, 1, 1);
+        List<KlayCredentials> senderCredentialsList = roleBaseAccountGenerator.getSenderCredentialForTest(isUpdateTest);
         List<KlayCredentials> feePayerCredentialsList = roleBaseAccountGenerator.getFeePayerAccountCredential();
 
         // 1. The transaction constructor creates and signs a transaction.
-        TransactionManager transactionManager = new TransactionManager.Builder(caver, transactionCredentialsList.get(0))
+        TransactionManager transactionManager = new TransactionManager.Builder(caver, senderCredentialsList.get(0))
                 .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
                 .setChaindId(LOCAL_CHAIN_ID)
                 .build();
@@ -184,11 +183,11 @@ public class RoleBasedIT extends Scenario{
     }
 
 
-    protected interface TransactionGetter{
+    protected interface TransactionGetter {
         TransactionTransformer get(String address) throws Exception;
     }
 
-    protected interface ReceiptChecker{
+    protected interface ReceiptChecker {
         void check(TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) throws Exception;
     }
 }

@@ -52,7 +52,7 @@ public class FeePayerManager {
         this.errorHandler = builder.errorHandler;
     }
 
-    private TxType decode(String rawTransaction) {
+    private TxTypeFeeDelegate decode(String rawTransaction) {
         return FeePayerTransactionDecoder.decode(rawTransaction);
     }
 
@@ -73,8 +73,8 @@ public class FeePayerManager {
     }
 
     public KlayRawTransaction sign(String rawTransaction) {
-        TxTypeFeeDelegate feeDelegateTxType = (TxTypeFeeDelegate) decode(rawTransaction);
-        return signer.sign(feeDelegateTxType);
+        TxTypeFeeDelegate txTypeFeeDelegate = decode(rawTransaction);
+        return signer.sign(txTypeFeeDelegate);
     }
 
     public String send(KlayRawTransaction klayRawTransaction) throws IOException, PlatformErrorException {

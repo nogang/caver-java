@@ -31,6 +31,13 @@ public class RoleBaseAccountGenerator extends Scenario {
         return feePayerAccountCredential;
     }
 
+    public List<KlayCredentials> getSenderCredentialForTest(boolean isUpdateTest) {
+        if (isUpdateTest) {
+            return updateAccountCredential;
+        }
+        return transactionAccountCredential;
+    }
+
     public KlayCredentials getOldAccount() {
         return oldAccount;
     }
@@ -50,47 +57,25 @@ public class RoleBaseAccountGenerator extends Scenario {
     private AccountKey newAccountKey;
     private String address;
 
-    public RoleBaseAccountGenerator() throws Exception{
+    public RoleBaseAccountGenerator() throws Exception {
         transactionAccountCredential = new ArrayList<>();
         updateAccountCredential = new ArrayList<>();
         feePayerAccountCredential = new ArrayList<>();
         this.caver = Caver.build(Caver.DEFAULT_URL);
     }
-    public void initTestSet(int transactionAccountCount, int updateAcocountCount, int feePayerAccountCount) throws Exception{
-        List<AccountKey> roleBasedAccountKeyList = new ArrayList<>();
-        List<ECKeyPair> transactionECKeyPairList = new ArrayList<>();
-        List<ECKeyPair> updateECKeyPairList = new ArrayList<>();
-        List<ECKeyPair> feePayerECKeyPairList = new ArrayList<>();
 
+    public void initTestSet(int transactionAccountCount, int updateAcocountCount, int feePayerAccountCount) throws Exception{
         oldAccount = createAccount();
         address = oldAccount.getAddress();
 
-        for (int i = 0 ; i < transactionAccountCount ; i ++) {
-            KlayCredentials credentials = KlayCredentials.create(createECKeyPairList(10/transactionAccountCount),createECKeyPairList(0),createECKeyPairList(0), oldAccount.getAddress());
-            transactionAccountCredential.add(credentials);
-            transactionECKeyPairList.addAll(credentials.getEcKeyPairsForTransactionList());
-        }
-        for (int i = 0 ; i < updateAcocountCount ; i ++) {
-            KlayCredentials credentials = KlayCredentials.create(createECKeyPairList(10/updateAcocountCount),createECKeyPairList(0),createECKeyPairList(0), oldAccount.getAddress());
-            updateAccountCredential.add(credentials);
-            updateECKeyPairList.addAll(credentials.getEcKeyPairsForUpdateList());
-        }
-        for (int i = 0 ; i < feePayerAccountCount ; i ++) {
-            KlayCredentials credentials = KlayCredentials.create(createECKeyPairList(10/feePayerAccountCount),createECKeyPairList(0),createECKeyPairList(0), oldAccount.getAddress());
-            feePayerAccountCredential.add(credentials);
-            feePayerECKeyPairList.addAll(credentials.getEcKeyPairsForFeePayerList());
-        }
-
-        roleBasedAccountKeyList.add(createRandomAccountKeyWeightedMultiSig(transactionECKeyPairList));
-        roleBasedAccountKeyList.add(createRandomAccountKeyWeightedMultiSig(updateECKeyPairList));
-        roleBasedAccountKeyList.add(createRandomAccountKeyWeightedMultiSig(feePayerECKeyPairList));
+        setRandomRoleBasedNewAccountKey(oldAccount, transactionAccountCount, updateAcocountCount, feePayerAccountCount);
 
         TransactionManager transactionManager = new TransactionManager.Builder(caver, oldAccount)
                 .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
                 .setChaindId(LOCAL_CHAIN_ID)
                 .build();
 
-        newAccountKey = AccountKeyRoleBased.create(roleBasedAccountKeyList);
+
         AccountUpdateTransaction accountUpdateTx = AccountUpdateTransaction.create(
                 oldAccount.getAddress(),
                 newAccountKey,
@@ -104,5 +89,34 @@ public class RoleBaseAccountGenerator extends Scenario {
         AccountKey responseAccountKey = klayAccountKey.getResult().getKey();
 
         assertEquals("Response\n" + responseAccountKey.toString()+ "\nExpected" + newAccountKey.toString(), responseAccountKey, newAccountKey);
+    }
+
+    public void setRandomRoleBasedNewAccountKey(KlayCredentials oldAccount, int transactionAccountCount, int updateAcocountCount, int feePayerAccountCount) throws Exception{
+        List<AccountKey> roleBasedAccountKeyList = new ArrayList<>();
+        List<ECKeyPair> transactionECKeyPairList = new ArrayList<>();
+        List<ECKeyPair> updateECKeyPairList = new ArrayList<>();
+        List<ECKeyPair> feePayerECKeyPairList = new ArrayList<>();
+
+        for (int i = 0 ; i < transactionAccountCount ; i ++) {
+            KlayCredentials credentials = KlayCredentials.create(createECKeyPairList(10/transactionAccountCount),createECKeyPairList(0),createECKeyPairList(0), oldAccount.getAddress());
+            transactionAccountCredential.add(credentials);
+            transactionECKeyPairList.addAll(credentials.getEcKeyPairsForTransactionList());
+        }
+        for (int i = 0 ; i < updateAcocountCount ; i ++) {
+            KlayCredentials credentials = KlayCredentials.create(createECKeyPairList(0),createECKeyPairList(10/updateAcocountCount),createECKeyPairList(0), oldAccount.getAddress());
+            updateAccountCredential.add(credentials);
+            updateECKeyPairList.addAll(credentials.getEcKeyPairsForUpdateList());
+        }
+        for (int i = 0 ; i < feePayerAccountCount ; i ++) {
+            KlayCredentials credentials = KlayCredentials.create(createECKeyPairList(0),createECKeyPairList(0), createECKeyPairList(10/feePayerAccountCount),oldAccount.getAddress());
+            feePayerAccountCredential.add(credentials);
+            feePayerECKeyPairList.addAll(credentials.getEcKeyPairsForFeePayerList());
+        }
+
+        roleBasedAccountKeyList.add(createRandomAccountKeyWeightedMultiSig(transactionECKeyPairList));
+        roleBasedAccountKeyList.add(createRandomAccountKeyWeightedMultiSig(updateECKeyPairList));
+        roleBasedAccountKeyList.add(createRandomAccountKeyWeightedMultiSig(feePayerECKeyPairList));
+
+        newAccountKey = AccountKeyRoleBased.create(roleBasedAccountKeyList);
     }
 }

@@ -132,37 +132,6 @@ public class FeePayerManagerTest {
     }
 
     @Test
-    public void kkk() throws Exception {
-
-        StringBuffer sb = new StringBuffer(64);
-        for (int i = 0; i < 4; i++) {
-            sb.append("0");
-        }
-
-        String kkk = "33e3er";
-        sb.append(kkk);
-
-
-        System.out.println(sb.toString());
-    }
-
-
-    @Test
-    public void multisigCredentialTest() throws Exception {
-        TransactionManager transactionManager = new TransactionManager.Builder(caver, MULTISIG)
-                .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 15))
-                .setChaindId(LOCAL_CHAIN_ID)
-                .build();
-
-        ValueTransfer valueTransfer = ValueTransfer.create(caver, transactionManager);
-
-        KlayTransactionReceipt.TransactionReceipt transactionReceipt = valueTransfer.sendFunds(MULTISIG.getAddress(), BRANDON.getAddress(), BigDecimal.valueOf(1), Convert.Unit.PEB, GAS_LIMIT).send();
-        assertEquals("0x1", transactionReceipt.getStatus());
-        //transactionManager.executeTransaction();
-
-    }
-
-    @Test
     public void decodeTest() {
         //0x20f901a8808505d21dba0083419ce094da1b6872d83e0c0d6f1dadeafc724d15f24dbff7b9013c05f90138b87204f86f02f86ce301a1039de7ec07d96083d5df216f7dfaefbab795e6e8fba8cee9b3b5d6cd45960c1212e301a102a720390669f70f4037b2fbf605c0249132c564277c3365860e91f1b6091d9340e301a103ab2f2478a390bb17897bb7f5e6ecaba4312dc8bb7482225cda586551c8ad9127b84e04f84b02f848e301a102d14ae8ba92ddd6eb263ff2ff4c8f777750e9f19d1e981cab89f686ffb5f063cae301a10338f98936ef860d5b6d9c5505dc053acb0242a7809e322ccbff193280c9e6552bb87204f86f02f86ce301a102d405aacfb1fbd3c91703856cd8b1829750179c9c2acf8167d8d6708d49e11400e301a1037c98fef2fb1c7424e49c62dc0ab12ab7e8c253e4ba70a5e3d777389b2813f130e301a102804e602553ecd0776bae0a3ed3a982621e4eebe6626e70fd062c0db65717e15df847f845820fe9a028e1a4f72b4b3e875ad9fa2127935cf671a63797848fdf7d9ed311e330d0cdd6a04f9bd532e4a2a1ae177d1898a0d6603e0ebb26ef626e58084720658b72e34ad6
         AbstractTxType rolebasedTx = TransactionDecoder.decode("0x20f901a8808505d21dba0083419ce094da1b6872d83e0c0d6f1dadeafc724d15f24dbff7b9013c05f90138b87204f86f02f86ce301a1039de7ec07d96083d5df216f7dfaefbab795e6e8fba8cee9b3b5d6cd45960c1212e301a102a720390669f70f4037b2fbf605c0249132c564277c3365860e91f1b6091d9340e301a103ab2f2478a390bb17897bb7f5e6ecaba4312dc8bb7482225cda586551c8ad9127b84e04f84b02f848e301a102d14ae8ba92ddd6eb263ff2ff4c8f777750e9f19d1e981cab89f686ffb5f063cae301a10338f98936ef860d5b6d9c5505dc053acb0242a7809e322ccbff193280c9e6552bb87204f86f02f86ce301a102d405aacfb1fbd3c91703856cd8b1829750179c9c2acf8167d8d6708d49e11400e301a1037c98fef2fb1c7424e49c62dc0ab12ab7e8c253e4ba70a5e3d777389b2813f130e301a102804e602553ecd0776bae0a3ed3a982621e4eebe6626e70fd062c0db65717e15df847f845820fe9a028e1a4f72b4b3e875ad9fa2127935cf671a63797848fdf7d9ed311e330d0cdd6a04f9bd532e4a2a1ae177d1898a0d6603e0ebb26ef626e58084720658b72e34ad6");
@@ -173,33 +142,6 @@ public class FeePayerManagerTest {
 
         System.out.println(tx);
     }
-
-
-    @Test
-    public void myTest4() throws Exception {
-        List<ECKeyPair> a = new ArrayList<ECKeyPair>();
-        List<ECKeyPair> b = new ArrayList<ECKeyPair>();
-
-        ECKeyPair k = ECKeyPair.create(Numeric.toBigInt("1234"));
-        ECKeyPair l = ECKeyPair.create(Numeric.toBigInt("1234"));
-
-        ECKeyPair m = ECKeyPair.create(Numeric.toBigInt("12345"));
-        ECKeyPair n = ECKeyPair.create(Numeric.toBigInt("12345"));
-
-        a.add(k);
-        a.add(n);
-        System.out.println(a.hashCode());
-        b.add(l);
-        b.add(n);
-        System.out.println(b.hashCode());
-
-
-    }
-
-    public List<String> getList() {
-        return null;
-    }
-
 
     @Test
     public void testFeePayerManagerValueTransferJasmine() throws Exception {
@@ -265,4 +207,3 @@ public class FeePayerManagerTest {
         return nonce;
     }
 }
-

@@ -28,7 +28,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
-                });
+                }, false);
     }
     //////////////////////////////// FeeDelegateTest ////////////////////////////////
     @Test
@@ -44,7 +44,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
-                });
+                }, false);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
-                });
+                }, false);
     }
     //////////////////////////////// MultiTransactionSignerTest ////////////////////////////////
     @Test
@@ -79,7 +79,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
-                });
+                }, false);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
 
-                });
+                }, false);
     }
 
     //////////////////////////////// MultiFeePayerTest ////////////////////////////////
@@ -117,7 +117,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
 
-                });
+                }, false);
     }
 
     @Test
@@ -137,7 +137,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
 
-                });
+                }, false);
     }
 
     //////////////////////////////// MultiSignerMultiFeePayerTest ////////////////////////////////
@@ -154,7 +154,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
-                });
+                }, false);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
-                });
+                }, false);
     }
 
 }

@@ -21,7 +21,6 @@ import java.util.Random;
 
 import static com.klaytn.caver.base.Accounts.BRANDON;
 import static com.klaytn.caver.base.LocalValues.LOCAL_CHAIN_ID;
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
@@ -88,7 +87,7 @@ public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
     public void smartContractExecutionTest() throws Exception {
         roleBasedTransactionTest(
                 getSmartContractExecutionTransactionGetter,
-                getSmartContractExecutionReceiptChecker);
+                getSmartContractExecutionReceiptChecker, false);
     }
 
     //////////////////////////////// FeeDelegateTest ////////////////////////////////
@@ -96,7 +95,7 @@ public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
     public void feeDelegatedSmartContractExecutionTest() throws Exception {
         feeDelegatedRoleBasedTransactionTest(
                 getFeeDelegatedSmartContractExecutionTransactionGetter,
-                getFeeDelegatedSmartContractExecutionReceiptChecker
+                getFeeDelegatedSmartContractExecutionReceiptChecker, false
         );
     }
 
@@ -106,7 +105,7 @@ public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
         BigInteger feeRatio = BigInteger.valueOf(random.nextInt(99) + 1);
         feeDelegatedRoleBasedTransactionTest(
                 getFeeRatioSmartContractExecutionTransactionGetter,
-                getFeeRatioSmartContractExecutionReceiptChecker
+                getFeeRatioSmartContractExecutionReceiptChecker, false
         );
     }
 
@@ -115,7 +114,7 @@ public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
     public void feeDelegatedSmartContractDeployMultiTransactionSignerTest() throws Exception {
         feeDelegatedRoleBasedMultiTransactionSignerTest(
                 getFeeDelegatedSmartContractExecutionTransactionGetter,
-                getFeeDelegatedSmartContractExecutionReceiptChecker
+                getFeeDelegatedSmartContractExecutionReceiptChecker, false
         );
     }
 
@@ -123,7 +122,7 @@ public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
     public void feeDelegatedSmartContractDeployWithRatioMultiTransactionSignerTest() throws Exception {
         feeDelegatedRoleBasedMultiTransactionSignerTest(
                 getFeeRatioSmartContractExecutionTransactionGetter,
-                getFeeRatioSmartContractExecutionReceiptChecker
+                getFeeRatioSmartContractExecutionReceiptChecker, false
         );
     }
 
@@ -132,7 +131,7 @@ public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
     public void feeDelegatedSmartContractDeployMultiFeePayerTest() throws Exception {
         feeDelegatedRoleBasedTransactionMultiFeePayerTest(
                 getFeeDelegatedSmartContractExecutionTransactionGetter,
-                getFeeDelegatedSmartContractExecutionReceiptChecker
+                getFeeDelegatedSmartContractExecutionReceiptChecker, false
         );
     }
 
@@ -140,7 +139,7 @@ public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
     public void feeDelegatedSmartContractDeployWithRatioMultiFeePayerTest() throws Exception {
         feeDelegatedRoleBasedTransactionMultiFeePayerTest(
                 getFeeRatioSmartContractExecutionTransactionGetter,
-                getFeeRatioSmartContractExecutionReceiptChecker
+                getFeeRatioSmartContractExecutionReceiptChecker, false
         );
     }
 
@@ -149,7 +148,7 @@ public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
     public void feeDelegatedSmartContractDeployMultiTransactionSignerMultiFeePayerTest() throws Exception {
         feeDelegatedRoleBasedTransactionMultiTransactionSignerMultiFeePayerTest(
                 getFeeDelegatedSmartContractExecutionTransactionGetter,
-                getFeeDelegatedSmartContractExecutionReceiptChecker
+                getFeeDelegatedSmartContractExecutionReceiptChecker, false
         );
     }
 
@@ -159,7 +158,7 @@ public class RoleBasedSmartContractExecoutionIT extends RoleBasedIT {
         BigInteger feeRatio = BigInteger.valueOf(random.nextInt(100));
         feeDelegatedRoleBasedTransactionMultiTransactionSignerMultiFeePayerTest(
                 getFeeRatioSmartContractExecutionTransactionGetter,
-                getFeeRatioSmartContractExecutionReceiptChecker
+                getFeeRatioSmartContractExecutionReceiptChecker, false
         );
     }
 
