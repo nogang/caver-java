@@ -80,8 +80,4 @@ public abstract class TransactionTransformer<T extends TransactionTransformer> {
     public abstract TxType build() throws UnsupportedTxTypeException;
 
     public abstract TxType buildFeeDelegated() throws UnsupportedTxTypeException;
-
-    public TxType build(boolean isFeeDelegated) throws UnsupportedTxTypeException {
-        return isFeeDelegated ? buildFeeDelegated() : build();
-    }
 }

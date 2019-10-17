@@ -132,61 +132,6 @@ public class FeePayerManagerTest {
     }
 
     @Test
-    public void testsets() throws Exception {
-        KlayCredentials piction = KlayCredentials.create(
-                "51ca9e2c73208291b3158d0fd2362c81d202fcb24d0f5b395640e03029f35023",
-                "0xc73DB144887fEAE6150E01df9D48F0293f26256f"
-        );
-
-        KlayCredentials user = KlayCredentials.create(
-                "7badbefbfce188e0d49e2f0b27bb6e9d0bde18e6f52238eecd40de0aa07c9eae",
-                "0xd6d6cc8037fbf0a28ce390395438caf91a1ac4a5"
-        );
-
-        KlayCredentials user2 = KlayCredentials.create(
-                new String[]{piction.getEcKeyPairsForTransactionList().get(0).getPrivateKey().toString(16)},
-                new String[]{user.getEcKeyPairsForTransactionList().get(0).getPrivateKey().toString(16)},
-                new String[]{},
-                "0xd6d6cc8037fbf0a28ce390395438caf91a1ac4a5"
-        );
-
-
-        TransactionManager tansactionManager = new TransactionManager.Builder(caver, user2)
-                .setChaindId(LOCAL_CHAIN_ID)
-                .build();
-
-        FeePayerManager feePayerManager = new FeePayerManager.Builder(caver, BRANDON)
-                .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
-                //.setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 100, 600))
-                .setChainId(LOCAL_CHAIN_ID)
-                .build();
-
-        System.out.println(user.getEcKeyPair().getPublicKey().toString(16));
-
-        AccountUpdateTransaction tx = AccountUpdateTransaction.create(
-                user.getAddress(), // from
-                AccountKeyRoleBased.create(Arrays.asList(
-                        AccountKeyPublic.create(user.getEcKeyPair().getPublicKey()), // RoleTransaction
-                        AccountKeyPublic.create(user.getEcKeyPair().getPublicKey()),
-                        AccountKeyPublic.create(user.getEcKeyPair().getPublicKey()) // RoleTransaction
-                        //AccountKeyPublic.create(piction.getEcKeyPair().getPublicKey()), // RoleAccountUpdate
-                        //AccountKeyPublic.create(BRANDON.getEcKeyPair().getPublicKey()) // RoleAccountUpdate
-                )), // accountKey
-                GAS_LIMIT // gasLimit
-        ).feeDelegate();
-
-        KlayRawTransaction senderTx = tansactionManager.sign(tx, true);
-
-
-        //println("tx: ${senderTx.valueAsString}")
-        String senderString = senderTx.getValueAsString();
-        KlayRawTransaction payerTx = feePayerManager.sign(senderString);
-//        println("payer tx: ${payerTx.valueAsString}")
-        feePayerManager.send(payerTx);
-
-    }
-
-    @Test
     public void kkk() throws Exception {
 
         StringBuffer sb = new StringBuffer(64);
@@ -201,63 +146,6 @@ public class FeePayerManagerTest {
         System.out.println(sb.toString());
     }
 
-    @Test
-    public void testsets2() throws Exception {
-        KlayCredentials piction = KlayCredentials.create(
-                "51ca9e2c73208291b3158d0fd2362c81d202fcb24d0f5b395640e03029f35023",
-                "0xc73DB144887fEAE6150E01df9D48F0293f26256f"
-        );
-
-        /*
-        KlayCredentials user = KlayCredentials.create(
-                "3723d07c082d2a010045fa2cb6d4b5563fadae15ddcc1cfc1a49700a6eafbb2",
-                "0x41164aa682fce926103f1325e2f9e4d7f23cd345"
-        );
-*/
-        KlayCredentials user = KlayCredentials.create(
-                "68b61479ab4cabc1a149ea7285e11b7e61d33111756d4f97953a093ad6fba3ab",
-                "0x58592f0c7799adb2c307257ae7403e43badc8b3e"
-        );
-
-        KlayCredentials user2 = KlayCredentials.create(
-                new String[]{user.getEcKeyPairsForTransactionList().get(0).getPrivateKey().toString(16)},
-                new String[]{piction.getEcKeyPairsForTransactionList().get(0).getPrivateKey().toString(16)},
-                new String[]{},
-                "0x41164aa682fce926103f1325e2f9e4d7f23cd345"
-        );
-
-        TransactionManager tansactionManager = new TransactionManager.Builder(caver, user)
-                .setChaindId(LOCAL_CHAIN_ID)
-                .build();
-
-        FeePayerManager feePayerManager = new FeePayerManager.Builder(caver, BRANDON)
-                .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
-                //.setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 100, 600))
-                .setChainId(LOCAL_CHAIN_ID)
-                .build();
-
-        System.out.println(user.getEcKeyPair().getPublicKey().toString(16));
-
-        AccountUpdateTransaction tx = AccountUpdateTransaction.create(
-                user.getAddress(), // from
-                AccountKeyRoleBased.create(Arrays.asList(
-                        AccountKeyPublic.create(user.getEcKeyPair().getPublicKey()) // RoleTransaction
-                        //AccountKeyPublic.create(piction.getEcKeyPair().getPublicKey()), // RoleAccountUpdate
-                        //AccountKeyPublic.create(BRANDON.getEcKeyPair().getPublicKey()) // RoleAccountUpdate
-                )), // accountKey
-                GAS_LIMIT // gasLimit
-        ).feeDelegate();
-
-        KlayRawTransaction senderTx = tansactionManager.sign(tx, true);
-
-
-        //println("tx: ${senderTx.valueAsString}")
-        String senderString = senderTx.getValueAsString();
-        KlayRawTransaction payerTx = feePayerManager.sign(senderString);
-//        println("payer tx: ${payerTx.valueAsString}")
-        feePayerManager.send(payerTx);
-
-    }
 
     @Test
     public void multisigCredentialTest() throws Exception {
