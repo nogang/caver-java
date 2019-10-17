@@ -61,7 +61,7 @@ public class FeePayer {
 
         String feePayer = txType.getFeePayer();
         if (!feePayer.equals("0x30")) {
-            for (KlaySignatureData feePayerSignatureData : txType.getFeePayerSignatureDataSet()) {
+            for (KlaySignatureData feePayerSignatureData : txType.getFeePayerSignatureData()) {
                 feePayerSignatureList.add(feePayerSignatureData.toRlpList());
             }
         }
