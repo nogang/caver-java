@@ -167,7 +167,7 @@ public abstract class AbstractTxType implements TxType {
         return senderSignatureDataSet;
     }
 
-    public Set<KlaySignatureData> getSenderSignatureDataSet(KlayCredentials credentials, int chainId) {
+    public Set<KlaySignatureData> getNewSenderSignatureDataSet(KlayCredentials credentials, int chainId) {
         Set<KlaySignatureData> senderSignatureDataList = new HashSet<>();
         KlaySignatureData signatureData = KlaySignatureData.createKlaySignatureDataFromChainId(chainId);
         byte[] encodedTransaction = getEncodedTransactionNoSig();
@@ -282,19 +282,17 @@ public abstract class AbstractTxType implements TxType {
      */
     @Override
     public KlayRawTransaction sign(KlayCredentials credentials, int chainId) {
-        // it's for not fee delegate
         if (nonce == null) {
             throw new EmptyNonceException();
         }
-        Set<KlaySignatureData> signatureDataSet = getSenderSignatureDataSet(credentials, chainId);
-        List<RlpType> rlpTypeList = new ArrayList<>(rlpValues());
+        Set<KlaySignatureData> newSignatureDataSet = getNewSenderSignatureDataSet(credentials, chainId);
+        addSenderSignatureData(newSignatureDataSet);
 
+        List<RlpType> rlpTypeList = new ArrayList<>(rlpValues());
         List<RlpType> senderSignatureList = new ArrayList<>();
 
-        this.senderSignatureDataSet.addAll(signatureDataSet);
-
-        for (KlaySignatureData a : this.senderSignatureDataSet) {
-            senderSignatureList.add(a.toRlpList());
+        for (KlaySignatureData klaySignatureData : getSenderSignatureDataSet()) {
+            senderSignatureList.add(klaySignatureData.toRlpList());
         }
 
         rlpTypeList.add(new RlpList(senderSignatureList));
@@ -303,12 +301,7 @@ public abstract class AbstractTxType implements TxType {
         byte[] type = {getType().get()};
         byte[] rawTx = BytesUtils.concat(type, encodedTransaction);
 
-        StringBuilder sb = new StringBuilder();
-        for(final byte b: rawTx)
-            sb.append(String.format("%02x ", b&0xff));
-        System.out.println(sb.toString());
-
-        return new KlayRawTransaction(rawTx, signatureDataSet); //todo: check why it need signatuedata
+        return new KlayRawTransaction(rawTx, getSenderSignatureData()); //todo: check why it need signatuedata
     }
 
     public KlayRawTransaction sign(String tx) {

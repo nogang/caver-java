@@ -145,14 +145,13 @@ public abstract class TxTypeFeeDelegate extends AbstractTxType {
         if (getNonce() == null) {
             throw new EmptyNonceException();
         }
-        Set<KlaySignatureData> signatureDataSet = getSenderSignatureDataSet(credentials, chainId);
-        List<RlpType> rlpTypeList = new ArrayList<>(rlpValues());
+        Set<KlaySignatureData> newSignatureDataSet = getNewSenderSignatureDataSet(credentials, chainId);
+        addSenderSignatureData(newSignatureDataSet);
 
+        List<RlpType> rlpTypeList = new ArrayList<>(rlpValues());
         List<RlpType> senderSignatureList = new ArrayList<>();
 
-        this.senderSignatureDataSet.addAll(signatureDataSet);
-
-        for (KlaySignatureData klaySignatureData : this.senderSignatureDataSet) {
+        for (KlaySignatureData klaySignatureData : getSenderSignatureDataSet()) {
             senderSignatureList.add(klaySignatureData.toRlpList());
         }
 
@@ -172,12 +171,6 @@ public abstract class TxTypeFeeDelegate extends AbstractTxType {
         byte[] encodedTransaction = RlpEncoder.encode(new RlpList(rlpTypeList));
         byte[] type = {getType().get()};
         byte[] rawTx = BytesUtils.concat(type, encodedTransaction);
-
-        StringBuilder sb = new StringBuilder();
-        for(final byte b: rawTx)
-            sb.append(String.format("%02x ", b&0xff));
-        System.out.println(sb.toString());
-
-        return new KlayRawTransaction(rawTx, signatureDataSet); //todo: check why it need signatuedata
+        return new KlayRawTransaction(rawTx, getSenderSignatureData());
     }
 }
