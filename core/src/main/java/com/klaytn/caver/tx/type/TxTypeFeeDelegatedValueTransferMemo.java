@@ -84,21 +84,26 @@ public class TxTypeFeeDelegatedValueTransferMemo extends TxTypeFeeDelegate {
      * @return TxTypeFeeDelegatedValueTransferMemo decoded transaction
      */
     public static TxTypeFeeDelegatedValueTransferMemo decodeFromRawTransaction(byte[] rawTransaction) {
-        byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+        // TxHashRLP = type + encode([nonce, gasPrice, gas, to, value, from, input, txSignatures, feePayer, feePayerSignatures])
+        try {
+            byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
-        RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
-        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
-        String to = ((RlpString) values.get(3)).asString();
-        BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
-        String from = ((RlpString) values.get(5)).asString();
-        byte[] payload = ((RlpString) values.get(6)).getBytes();
-        TxTypeFeeDelegatedValueTransferMemo tx
-                = TxTypeFeeDelegatedValueTransferMemo.createTransaction(nonce, gasPrice, gasLimit, to, value, from, payload);
-        tx.addSignatureData(values, 7);
-        return tx;
+            RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
+            List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+            BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+            BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+            BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+            String to = ((RlpString) values.get(3)).asString();
+            BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
+            String from = ((RlpString) values.get(5)).asString();
+            byte[] payload = ((RlpString) values.get(6)).getBytes();
+            TxTypeFeeDelegatedValueTransferMemo tx
+                    = TxTypeFeeDelegatedValueTransferMemo.createTransaction(nonce, gasPrice, gasLimit, to, value, from, payload);
+            tx.addSignatureData(values, 7);
+            return tx;
+        } catch (Exception e) {
+            throw new RuntimeException("Incorrectly encoded tx.");
+        }
     }
 
     /**

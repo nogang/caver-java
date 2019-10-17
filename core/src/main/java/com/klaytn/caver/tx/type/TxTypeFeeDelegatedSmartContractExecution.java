@@ -17,7 +17,10 @@
 package com.klaytn.caver.tx.type;
 
 import com.klaytn.caver.utils.KlayTransactionUtils;
-import org.web3j.rlp.*;
+import org.web3j.rlp.RlpDecoder;
+import org.web3j.rlp.RlpList;
+import org.web3j.rlp.RlpString;
+import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
@@ -85,22 +88,26 @@ public class TxTypeFeeDelegatedSmartContractExecution extends TxTypeFeeDelegate 
      * @return TxTypeFeeDelegatedSmartContractExecution decoded transaction
      */
     public static TxTypeFeeDelegatedSmartContractExecution decodeFromRawTransaction(byte[] rawTransaction) {
-        byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+        try {
+            byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
-        RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
-        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
-        String to = ((RlpString) values.get(3)).asString();
-        BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
-        String from = ((RlpString) values.get(5)).asString();
-        byte[] payload = ((RlpString) values.get(6)).getBytes();
+            RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
+            List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+            BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+            BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+            BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+            String to = ((RlpString) values.get(3)).asString();
+            BigInteger value = ((RlpString) values.get(4)).asPositiveBigInteger();
+            String from = ((RlpString) values.get(5)).asString();
+            byte[] payload = ((RlpString) values.get(6)).getBytes();
 
-        TxTypeFeeDelegatedSmartContractExecution tx
-                = TxTypeFeeDelegatedSmartContractExecution.createTransaction(nonce, gasPrice, gasLimit, to, value, from, payload);
-        tx.addSignatureData(values, 7);
-        return tx;
+            TxTypeFeeDelegatedSmartContractExecution tx
+                    = TxTypeFeeDelegatedSmartContractExecution.createTransaction(nonce, gasPrice, gasLimit, to, value, from, payload);
+            tx.addSignatureData(values, 7);
+            return tx;
+        } catch (Exception e) {
+            throw new RuntimeException("Incorrectly encoded tx.");
+        }
     }
 
     /**

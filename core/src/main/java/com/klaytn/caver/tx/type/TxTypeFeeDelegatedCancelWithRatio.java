@@ -86,20 +86,24 @@ public class TxTypeFeeDelegatedCancelWithRatio extends TxTypeFeeDelegate {
      */
     public static TxTypeFeeDelegatedCancelWithRatio decodeFromRawTransaction(byte[] rawTransaction) {
         //TxHashRLP = type + encode([nonce, gasPrice, gas, from, feeRatio, txSignatures, feePayer, feePayerSignatures])
-        byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
+        try {
+            byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
-        RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
-        List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
-        BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
-        BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
-        BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
-        String from = ((RlpString) values.get(3)).asString();
-        BigInteger feeRatio = ((RlpString) values.get(4)).asPositiveBigInteger();
+            RlpList rlpList = RlpDecoder.decode(rawTransactionExceptType);
+            List<RlpType> values = ((RlpList) rlpList.getValues().get(0)).getValues();
+            BigInteger nonce = ((RlpString) values.get(0)).asPositiveBigInteger();
+            BigInteger gasPrice = ((RlpString) values.get(1)).asPositiveBigInteger();
+            BigInteger gasLimit = ((RlpString) values.get(2)).asPositiveBigInteger();
+            String from = ((RlpString) values.get(3)).asString();
+            BigInteger feeRatio = ((RlpString) values.get(4)).asPositiveBigInteger();
 
-        TxTypeFeeDelegatedCancelWithRatio tx
-                = TxTypeFeeDelegatedCancelWithRatio.createTransaction(nonce, gasPrice, gasLimit, from, feeRatio);
-        tx.addSignatureData(values, 5);
-        return tx;
+            TxTypeFeeDelegatedCancelWithRatio tx
+                    = TxTypeFeeDelegatedCancelWithRatio.createTransaction(nonce, gasPrice, gasLimit, from, feeRatio);
+            tx.addSignatureData(values, 5);
+            return tx;
+        } catch (Exception e) {
+            throw new RuntimeException("Incorrectly encoded tx.");
+        }
     }
 
     /**
