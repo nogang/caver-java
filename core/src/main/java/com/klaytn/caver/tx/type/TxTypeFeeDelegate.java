@@ -38,6 +38,7 @@ import java.util.Set;
  */
 public abstract class TxTypeFeeDelegate extends AbstractTxType {
     final static String EMPTY_FEE_PAYER_ADDRESS = "0x30";
+    final static int DEFAULT_FEE_RATIO = 100;
 
     private Set<KlaySignatureData> feePayerSignatureData;
     private String feePayer;
@@ -62,7 +63,7 @@ public abstract class TxTypeFeeDelegate extends AbstractTxType {
     }
 
     public BigInteger getFeeRatio() {
-        return BigInteger.valueOf(100);
+        return BigInteger.valueOf(DEFAULT_FEE_RATIO);
     }
 
     /**
@@ -157,8 +158,7 @@ public abstract class TxTypeFeeDelegate extends AbstractTxType {
 
         rlpTypeList.add(new RlpList(senderSignatureList));
         rlpTypeList.add(RlpString.create(Numeric.hexStringToByteArray(this.feePayer)));
-
-        if (this.feePayer.equals("0x30")){
+        if (this.feePayer.equals(EMPTY_FEE_PAYER_ADDRESS)) {
             rlpTypeList.add(new RlpList(KlaySignatureData.createKlaySignatureDataFromChainId(1).toRlpList()));
         } else {
             List<RlpType> feePayerSignatureList = new ArrayList<>();
