@@ -9,9 +9,9 @@ import com.klaytn.caver.tx.model.KlayRawTransaction;
 import com.klaytn.caver.tx.model.TransactionTransformer;
 
 import java.util.List;
+import java.util.Random;
 
 import static com.klaytn.caver.base.LocalValues.LOCAL_CHAIN_ID;
-import static org.junit.Assert.assertEquals;
 
 public class RoleBasedIT extends Scenario {
     protected final String MEMO = "Klaytn MemoTest 1234567890!";
@@ -32,9 +32,12 @@ public class RoleBasedIT extends Scenario {
     }
 
     protected void feeDelegatedRoleBasedMultiTransactionSignerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
-        int transactionAccountSize = 10;
+        AccountSizeGenerator accountSizeGenerator = new AccountSizeGenerator(isUpdateTest);
+        int transactionAccountSize = accountSizeGenerator.getTransactionAccountSize();
+        int updateAccountSize = accountSizeGenerator.getUpdateAccountSize();
+
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
-        roleBaseAccountGenerator.initTestSet(transactionAccountSize, 1, 1);
+        roleBaseAccountGenerator.initTestSet(transactionAccountSize, updateAccountSize, 1);
         List<KlayCredentials> senderCredentialsList = roleBaseAccountGenerator.getSenderCredentialForTest(isUpdateTest);
         List<KlayCredentials> feePayerCredentialsList = roleBaseAccountGenerator.getFeePayerAccountCredential();
 
@@ -42,7 +45,7 @@ public class RoleBasedIT extends Scenario {
         KlayTransactionReceipt.TransactionReceipt transactionReceipt;
         TransactionTransformer transactionTransformer = null;
 
-        for (int i = 0; i < transactionAccountSize; i++) {
+        for (int i = 0; i < senderCredentialsList.size(); i++) {
             TransactionManager transactionManager = new TransactionManager.Builder(caver, senderCredentialsList.get(i))
                     .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
                     .setChaindId(LOCAL_CHAIN_ID)
@@ -69,7 +72,9 @@ public class RoleBasedIT extends Scenario {
     }
 
     protected void feeDelegatedRoleBasedTransactionMultiFeePayerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
-        int feePayerAccountSize = 10;
+        AccountSizeGenerator accountSizeGenerator = new AccountSizeGenerator(isUpdateTest);
+        int feePayerAccountSize = accountSizeGenerator.getFeePayerAccountSize();
+
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
         roleBaseAccountGenerator.initTestSet(1, 1, feePayerAccountSize);
         List<KlayCredentials> senderCredentialsList = roleBaseAccountGenerator.getSenderCredentialForTest(isUpdateTest);
@@ -109,12 +114,14 @@ public class RoleBasedIT extends Scenario {
         receiptChecker.check(transactionTransformer, transactionReceipt);
     }
 
-
     protected void feeDelegatedRoleBasedTransactionMultiTransactionSignerMultiFeePayerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
-        int transactionAccountSize = 10;
-        int feePayerAccountSize = 10;
+        AccountSizeGenerator accountSizeGenerator = new AccountSizeGenerator(isUpdateTest);
+        int transactionAccountSize = accountSizeGenerator.getTransactionAccountSize();
+        int updateAccountSize = accountSizeGenerator.getUpdateAccountSize();
+        int feePayerAccountSize = accountSizeGenerator.getFeePayerAccountSize();
+
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
-        roleBaseAccountGenerator.initTestSet(transactionAccountSize, 1, feePayerAccountSize);
+        roleBaseAccountGenerator.initTestSet(transactionAccountSize, updateAccountSize, feePayerAccountSize);
         List<KlayCredentials> senderCredentialsList = roleBaseAccountGenerator.getSenderCredentialForTest(isUpdateTest);
         List<KlayCredentials> feePayerCredentialsList = roleBaseAccountGenerator.getFeePayerAccountCredential();
 
@@ -122,7 +129,7 @@ public class RoleBasedIT extends Scenario {
         KlayTransactionReceipt.TransactionReceipt transactionReceipt = null;
         TransactionTransformer transactionTransformer = null;
 
-        for (int i = 0; i < transactionAccountSize; i++) {
+        for (int i = 0; i < senderCredentialsList.size(); i++) {
             TransactionManager transactionManager = new TransactionManager.Builder(caver, senderCredentialsList.get(i))
                     .setTransactionReceiptProcessor(new PollingTransactionReceiptProcessor(caver, 1000, 10))
                     .setChaindId(LOCAL_CHAIN_ID)
@@ -156,7 +163,6 @@ public class RoleBasedIT extends Scenario {
         receiptChecker.check(transactionTransformer, transactionReceipt);
     }
 
-
     protected void feeDelegatedRoleBasedTransactionTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
         roleBaseAccountGenerator.initTestSet(1, 1, 1);
@@ -187,7 +193,40 @@ public class RoleBasedIT extends Scenario {
         TransactionTransformer get(String address) throws Exception;
     }
 
+
     protected interface ReceiptChecker {
         void check(TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) throws Exception;
+    }
+
+
+}
+
+class AccountSizeGenerator {
+    private int transactionAccountSize;
+    private int updateAccountSize;
+    private int feePayerAccountSize;
+    private int senderSize;
+
+    public AccountSizeGenerator(boolean isUpdateTest) {
+        Random random = new Random();
+        this.transactionAccountSize = random.nextInt(9) + 1;
+        this.updateAccountSize = random.nextInt(9) + 1;
+        this.feePayerAccountSize = random.nextInt(9) + 1;
+        if (isUpdateTest) {
+            senderSize = updateAccountSize;
+        } else
+            senderSize = transactionAccountSize;
+    }
+
+    public int getTransactionAccountSize() {
+        return transactionAccountSize;
+    }
+
+    public int getUpdateAccountSize() {
+        return updateAccountSize;
+    }
+
+    public int getFeePayerAccountSize() {
+        return feePayerAccountSize;
     }
 }
