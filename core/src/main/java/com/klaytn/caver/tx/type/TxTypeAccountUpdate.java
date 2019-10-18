@@ -104,7 +104,7 @@ public class TxTypeAccountUpdate extends AbstractTxType {
             tx.addSignatureData(values, 5);
             return tx;
         } catch (Exception e) {
-            throw new RuntimeException("Incorrectly encoded tx.");
+            throw new RuntimeException("There is a error in the processing of decoding tx");
         }
     }
 
@@ -114,24 +114,6 @@ public class TxTypeAccountUpdate extends AbstractTxType {
      */
     public static TxTypeAccountUpdate decodeFromRawTransaction(String rawTransaction) {
         return decodeFromRawTransaction(Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(rawTransaction)));
-    }
-
-    public List<KlaySignatureData> getSenderSignatureDataList(KlayCredentials credentials, int chainId) {
-        List<KlaySignatureData> senderSignatureDataList = new ArrayList<>();
-        KlaySignatureData signatureData = KlaySignatureData.createKlaySignatureDataFromChainId(chainId);
-        byte[] encodedTransaction = getEncodedTransactionNoSig();
-
-        List<RlpType> rlpTypeList = new ArrayList<>();
-        rlpTypeList.add(RlpString.create(encodedTransaction));
-        rlpTypeList.addAll(signatureData.toRlpList().getValues());
-        byte[] encodedTransaction2 = RlpEncoder.encode(new RlpList(rlpTypeList));
-
-        for (ECKeyPair ecKeyPair : credentials.getEcKeyPairsForUpdateList()) {
-            Sign.SignatureData signedSignatureData = Sign.signMessage(encodedTransaction2, ecKeyPair);
-            senderSignatureDataList.add(KlaySignatureDataUtils.createEip155KlaySignatureData(signedSignatureData, chainId));
-        }
-
-        return senderSignatureDataList;
     }
 
     protected List<ECKeyPair> getEcKeyPairsForSenderSign(KlayCredentials credentials) {

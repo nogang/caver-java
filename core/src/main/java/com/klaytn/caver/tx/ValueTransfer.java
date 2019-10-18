@@ -22,11 +22,9 @@ package com.klaytn.caver.tx;
 
 import com.klaytn.caver.Caver;
 import com.klaytn.caver.crypto.KlayCredentials;
-import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.methods.response.KlayTransactionReceipt;
 import com.klaytn.caver.tx.manager.ErrorHandler;
 import com.klaytn.caver.tx.manager.TransactionManager;
-import com.klaytn.caver.tx.model.KlayRawTransaction;
 import com.klaytn.caver.utils.Convert;
 import com.klaytn.caver.tx.model.ValueTransferTransaction;
 import org.web3j.protocol.core.RemoteCall;
@@ -43,8 +41,10 @@ public class ValueTransfer extends ManagedTransaction {
         super(caver, transactionManager);
     }
 
-    private ValueTransferTransaction makeValutransferTransaction(String fromAddress, String toAddress, BigDecimal value, Convert.Unit unit,
-                                        BigInteger gasLimit) {
+    private KlayTransactionReceipt.TransactionReceipt send(
+            String fromAddress, String toAddress, BigDecimal value, Convert.Unit unit,
+            BigInteger gasLimit) {
+
         BigDecimal klayValue = Convert.toPeb(value, unit);
         if (!Numeric.isIntegerValue(klayValue)) {
             throw new UnsupportedOperationException(
@@ -54,13 +54,7 @@ public class ValueTransfer extends ManagedTransaction {
 
         ValueTransferTransaction transaction = ValueTransferTransaction.create(
                 fromAddress, toAddress, klayValue.toBigIntegerExact(), gasLimit);
-        return transaction;
-    }
 
-    private KlayTransactionReceipt.TransactionReceipt send(
-            String fromAddress, String toAddress, BigDecimal value, Convert.Unit unit,
-            BigInteger gasLimit) {
-        ValueTransferTransaction transaction = makeValutransferTransaction(fromAddress, toAddress, value, unit, gasLimit);
         return send(transaction);
     }
 

@@ -61,7 +61,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                 ).feeDelegate().feeRatio(feeRatio),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
                 }, false);
     }
@@ -96,7 +96,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                 ).feeDelegate().feeRatio(feeRatio),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
 
                 }, false);
@@ -134,7 +134,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                 ).feeDelegate().feeRatio(feeRatio),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
 
                 }, false);
@@ -171,7 +171,7 @@ public class RoleBasedSmartContractDeployIT extends RoleBasedIT {
                 ).feeDelegate().feeRatio(feeRatio),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                     assertEquals(CONTRACT_INPUT, transactionReceipt.getInput());
                 }, false);
     }

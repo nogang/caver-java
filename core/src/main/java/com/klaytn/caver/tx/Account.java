@@ -22,12 +22,10 @@ package com.klaytn.caver.tx;
 
 import com.klaytn.caver.Caver;
 import com.klaytn.caver.crypto.KlayCredentials;
-import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.methods.response.KlayTransactionReceipt;
 import com.klaytn.caver.tx.manager.ErrorHandler;
 import com.klaytn.caver.tx.manager.TransactionManager;
 import com.klaytn.caver.tx.model.AccountUpdateTransaction;
-import com.klaytn.caver.tx.model.KlayRawTransaction;
 import org.web3j.protocol.core.RemoteCall;
 
 public class Account extends ManagedTransaction {

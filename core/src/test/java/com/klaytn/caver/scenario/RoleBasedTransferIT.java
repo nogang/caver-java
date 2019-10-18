@@ -60,7 +60,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                 }, false);
     }
     @Test
@@ -71,7 +71,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (String address) -> ValueTransferTransaction.create(address, BRANDON.getAddress(), BigInteger.ONE, GAS_LIMIT).feeDelegate().feeRatio(feeRatio),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                 }, false);
     }
     //////////////////////////////// MultiTransactionSignerTest - value Transfer ////////////////////////////////
@@ -102,7 +102,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                 }, false);
     }
     @Test
@@ -113,7 +113,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (String address) -> ValueTransferTransaction.create(address, BRANDON.getAddress(), BigInteger.ONE, GAS_LIMIT).feeDelegate().feeRatio(feeRatio),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                    assertEquals(Numeric.toHexStringWithPrefixSafe(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                 }, false);
     }
 
@@ -145,7 +145,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                 }, false);
     }
     @Test
@@ -156,7 +156,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (String address) -> ValueTransferTransaction.create(address, BRANDON.getAddress(), BigInteger.ONE, GAS_LIMIT).feeDelegate().feeRatio(feeRatio),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                 }, false);
     }
 
@@ -188,7 +188,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
                     assertEquals(Numeric.toHexString(MEMO.getBytes()), transactionReceipt.getInput());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                 }, false);
     }
     @Test
@@ -199,7 +199,7 @@ public class RoleBasedTransferIT extends RoleBasedIT {
                 (String address) -> ValueTransferTransaction.create(address, BRANDON.getAddress(), BigInteger.ONE, GAS_LIMIT).feeDelegate().feeRatio(feeRatio),
                 (TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) ->{
                     assertEquals("0x1", transactionReceipt.getStatus());
-                    assertEquals(Numeric.toHexStringWithPrefix(feeRatio), transactionReceipt.getFeeRatio());
+                    assertEquals("0x" + Numeric.toHexStringNoPrefix(feeRatio), transactionReceipt.getFeeRatio());
                 }, false);
     }
 }

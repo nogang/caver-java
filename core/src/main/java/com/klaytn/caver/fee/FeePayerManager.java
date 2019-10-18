@@ -31,7 +31,6 @@ import com.klaytn.caver.methods.response.Callback;
 import com.klaytn.caver.methods.response.KlayTransactionReceipt;
 import com.klaytn.caver.tx.model.KlayRawTransaction;
 import com.klaytn.caver.tx.type.AbstractTxType;
-import com.klaytn.caver.tx.type.TxType;
 import com.klaytn.caver.tx.type.TxTypeFeeDelegate;
 import com.klaytn.caver.utils.ChainId;
 import org.web3j.protocol.exceptions.TransactionException;
@@ -52,7 +51,7 @@ public class FeePayerManager {
         this.errorHandler = builder.errorHandler;
     }
 
-    private TxType decode(String rawTransaction) {
+    private TxTypeFeeDelegate decode(String rawTransaction) {
         return FeePayerTransactionDecoder.decode(rawTransaction);
     }
 
@@ -73,8 +72,8 @@ public class FeePayerManager {
     }
 
     public KlayRawTransaction sign(String rawTransaction) {
-        TxTypeFeeDelegate feeDelegateTxType = (TxTypeFeeDelegate) decode(rawTransaction);
-        return signer.sign(feeDelegateTxType);
+        TxTypeFeeDelegate txTypeFeeDelegate = decode(rawTransaction);
+        return signer.sign(txTypeFeeDelegate);
     }
 
     public String send(KlayRawTransaction klayRawTransaction) throws IOException, PlatformErrorException {

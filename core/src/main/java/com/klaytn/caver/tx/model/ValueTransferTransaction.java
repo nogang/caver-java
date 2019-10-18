@@ -52,7 +52,6 @@ public class ValueTransferTransaction extends TransactionTransformer<ValueTransf
         if (feeDelegate) {
             return buildFeeDelegated();
         }
-
         return buildWithoutFeeDelegated();
     }
 

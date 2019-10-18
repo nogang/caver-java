@@ -37,6 +37,7 @@ import java.util.Set;
 
 public class FeePayer {
 
+    final static String EMPTY_FEE_PAYER_ADDRESS = "0x30";
     private KlayCredentials credentials;
     private int chainId;
 
@@ -60,7 +61,7 @@ public class FeePayer {
         List<RlpType> feePayerSignatureList = new ArrayList<>();
 
         String feePayer = txType.getFeePayer();
-        if (!feePayer.equals("0x30")) {
+        if (!feePayer.equals(EMPTY_FEE_PAYER_ADDRESS)) {
             for (KlaySignatureData feePayerSignatureData : txType.getFeePayerSignatureData()) {
                 feePayerSignatureList.add(feePayerSignatureData.toRlpList());
             }
@@ -77,6 +78,7 @@ public class FeePayer {
         return new KlayRawTransaction(rawTx, feePayerSignatureDataSet);
     }
 
+    @Deprecated
     public KlaySignatureData getSignatureData(AbstractTxType txType) {
         KlaySignatureData signatureData = KlaySignatureData.createKlaySignatureDataFromChainId(chainId);
         byte[] encodedTransaction = txType.getEncodedTransactionNoSig();
@@ -86,6 +88,7 @@ public class FeePayer {
         rlpTypeList.add(RlpString.create(Numeric.hexStringToByteArray(credentials.getAddress())));
         rlpTypeList.addAll(signatureData.toRlpList().getValues());
         byte[] encodedTransaction2 = RlpEncoder.encode(new RlpList(rlpTypeList));
+
         Sign.SignatureData signedSignatureData = Sign.signMessage(encodedTransaction2, credentials.getEcKeyPair());
         return KlaySignatureDataUtils.createEip155KlaySignatureData(signedSignatureData, chainId);
     }

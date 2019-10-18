@@ -16,7 +16,6 @@
 
 package com.klaytn.caver.tx.model;
 
-import com.klaytn.caver.tx.ValueTransfer;
 import com.klaytn.caver.tx.exception.UnsupportedTxTypeException;
 import com.klaytn.caver.tx.type.TxType;
 import com.klaytn.caver.utils.Convert;
@@ -51,6 +50,11 @@ public abstract class TransactionTransformer<T extends TransactionTransformer> {
         return (T) this;
     }
 
+    public T feeDelegate() {
+        this.feeDelegate = true;
+        return (T) this;
+    }
+
     public TransactionTransformer(String from, BigInteger gasLimit) {
         this.from = from;
         this.gasLimit = gasLimit;
@@ -68,11 +72,6 @@ public abstract class TransactionTransformer<T extends TransactionTransformer> {
         return from;
     }
 
-    public T feeDelegate() {
-        this.feeDelegate = true;
-        return (T) this;
-    }
-
     public BigInteger getGasLimit() {
         return gasLimit;
     }
@@ -80,4 +79,8 @@ public abstract class TransactionTransformer<T extends TransactionTransformer> {
     public abstract TxType build() throws UnsupportedTxTypeException;
 
     public abstract TxType buildFeeDelegated() throws UnsupportedTxTypeException;
+
+    public TxType build(boolean isFeeDelegated) throws UnsupportedTxTypeException {
+        return isFeeDelegated ? buildFeeDelegated() : build();
+    }
 }
