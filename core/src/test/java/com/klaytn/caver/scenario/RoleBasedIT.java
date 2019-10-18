@@ -32,7 +32,7 @@ public class RoleBasedIT extends Scenario {
     }
 
     protected void feeDelegatedRoleBasedMultiTransactionSignerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
-        AccountSizeGenerator accountSizeGenerator = new AccountSizeGenerator(isUpdateTest);
+        AccountSizeGenerator accountSizeGenerator = new AccountSizeGenerator();
         int transactionAccountSize = accountSizeGenerator.getTransactionAccountSize();
         int updateAccountSize = accountSizeGenerator.getUpdateAccountSize();
 
@@ -72,7 +72,7 @@ public class RoleBasedIT extends Scenario {
     }
 
     protected void feeDelegatedRoleBasedTransactionMultiFeePayerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
-        AccountSizeGenerator accountSizeGenerator = new AccountSizeGenerator(isUpdateTest);
+        AccountSizeGenerator accountSizeGenerator = new AccountSizeGenerator();
         int feePayerAccountSize = accountSizeGenerator.getFeePayerAccountSize();
 
         RoleBaseAccountGenerator roleBaseAccountGenerator = new RoleBaseAccountGenerator();
@@ -115,7 +115,7 @@ public class RoleBasedIT extends Scenario {
     }
 
     protected void feeDelegatedRoleBasedTransactionMultiTransactionSignerMultiFeePayerTest(TransactionGetter transactionGetter, ReceiptChecker receiptChecker, boolean isUpdateTest) throws Exception {
-        AccountSizeGenerator accountSizeGenerator = new AccountSizeGenerator(isUpdateTest);
+        AccountSizeGenerator accountSizeGenerator = new AccountSizeGenerator();
         int transactionAccountSize = accountSizeGenerator.getTransactionAccountSize();
         int updateAccountSize = accountSizeGenerator.getUpdateAccountSize();
         int feePayerAccountSize = accountSizeGenerator.getFeePayerAccountSize();
@@ -188,34 +188,25 @@ public class RoleBasedIT extends Scenario {
         receiptChecker.check(transactionTransformer, transactionReceipt);
     }
 
-
     protected interface TransactionGetter {
         TransactionTransformer get(String address) throws Exception;
     }
 
-
     protected interface ReceiptChecker {
         void check(TransactionTransformer transactionTransformer, KlayTransactionReceipt.TransactionReceipt transactionReceipt) throws Exception;
     }
-
-
 }
 
 class AccountSizeGenerator {
     private int transactionAccountSize;
     private int updateAccountSize;
     private int feePayerAccountSize;
-    private int senderSize;
 
-    public AccountSizeGenerator(boolean isUpdateTest) {
+    public AccountSizeGenerator() {
         Random random = new Random();
         this.transactionAccountSize = random.nextInt(9) + 1;
         this.updateAccountSize = random.nextInt(9) + 1;
         this.feePayerAccountSize = random.nextInt(9) + 1;
-        if (isUpdateTest) {
-            senderSize = updateAccountSize;
-        } else
-            senderSize = transactionAccountSize;
     }
 
     public int getTransactionAccountSize() {

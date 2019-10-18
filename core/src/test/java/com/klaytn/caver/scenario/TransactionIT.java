@@ -275,7 +275,6 @@ public class TransactionIT extends Scenario {
     @Test
     public void testTxTypeSmartContractExecution() throws Exception {
         String deployedContract = getDeployedContract();
-        //String deployedContract = "0xfc4c22556226da4692ec24ddcd223d5c06a5d9fa";
 
         TxTypeSmartContractExecution tx = TxTypeSmartContractExecution.createTransaction(
                 getNonce(BRANDON.getAddress()),
