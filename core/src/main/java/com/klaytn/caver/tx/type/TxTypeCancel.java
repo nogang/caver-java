@@ -16,6 +16,7 @@
 
 package com.klaytn.caver.tx.type;
 
+import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.utils.KlayTransactionUtils;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
@@ -64,8 +65,14 @@ public class TxTypeCancel extends AbstractTxType {
         return Type.CANCEL;
     }
 
+    /**
+     * decode transaction hash from sender to reconstruct transaction with fee payer signature.
+     *
+     * @param rawTransaction RLP-encoded signed transaction from sender
+     * @return TxTypeCancel decoded transaction
+     */
     public static TxTypeCancel decodeFromRawTransaction(byte[] rawTransaction) {
-        // SenderTxHashRLP = type + encode([nonce, gasPrice, gas, from, txSignatures])
+        // TxHashRLP = type + encode([nonce, gasPrice, gas, from, txSignatures])
         try {
             byte[] rawTransactionExceptType = KlayTransactionUtils.getRawTransactionNoType(rawTransaction);
 
@@ -78,14 +85,13 @@ public class TxTypeCancel extends AbstractTxType {
 
             TxTypeCancel tx
                     = TxTypeCancel.createTransaction(nonce, gasPrice, gasLimit, from);
-
             tx.addSignatureData(values, 4);
-
             return tx;
         } catch (Exception e) {
             throw new RuntimeException("There is a error in the processing of decoding tx");
         }
     }
+
     /**
      * @param rawTransaction RLP-encoded signed transaction from sender
      * @return TxTypeCancel decoded transaction
