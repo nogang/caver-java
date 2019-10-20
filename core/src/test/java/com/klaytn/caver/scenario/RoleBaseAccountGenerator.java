@@ -64,7 +64,7 @@ public class RoleBaseAccountGenerator extends Scenario {
         return address;
     }
 
-    public void initTestSet(int transactionAccountCount, int updateAccountCount, int feePayerAccountCount) throws Exception {
+    public void generateTestAccount(int transactionAccountCount, int updateAccountCount, int feePayerAccountCount) throws Exception {
         oldAccount = createAccount();
         address = oldAccount.getAddress();
 
