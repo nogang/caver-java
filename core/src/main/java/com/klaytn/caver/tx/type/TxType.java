@@ -20,7 +20,6 @@ import com.klaytn.caver.crypto.KlayCredentials;
 import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.tx.model.KlayRawTransaction;
 import org.web3j.rlp.RlpType;
-import org.web3j.utils.Numeric;
 
 import java.util.List;
 

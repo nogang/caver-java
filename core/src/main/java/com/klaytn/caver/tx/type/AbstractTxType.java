@@ -167,6 +167,13 @@ public abstract class AbstractTxType implements TxType {
         return senderSignatureDataSet;
     }
 
+    /**
+     * rlp encoding for signature(SigRLP)
+     *
+     * @param credentials credential info of a signer
+     * @param chainId     chain ID
+     * @return Set processed signature data
+     */
     public Set<KlaySignatureData> getNewSenderSignatureDataSet(KlayCredentials credentials, int chainId) {
         Set<KlaySignatureData> senderSignatureDataList = new HashSet<>();
         KlaySignatureData signatureData = KlaySignatureData.createKlaySignatureDataFromChainId(chainId);
@@ -185,6 +192,12 @@ public abstract class AbstractTxType implements TxType {
         return senderSignatureDataList;
     }
 
+    /**
+     * get the keys you need to sign transactions
+     *
+     * @param credentials credentials for signing
+     * @return List of keys for signing
+     */
     protected List<ECKeyPair> getEcKeyPairsForSenderSign(KlayCredentials credentials) {
         return credentials.getEcKeyPairsForTransactionList();
     }
@@ -301,14 +314,6 @@ public abstract class AbstractTxType implements TxType {
         byte[] type = {getType().get()};
         byte[] rawTx = BytesUtils.concat(type, encodedTransaction);
 
-        return new KlayRawTransaction(rawTx, getSenderSignatureData()); //todo: check why it need signatuedata
-    }
-
-    public KlayRawTransaction sign(String tx) {
-        // it's for no fee delegate
-        TxType a = FeePayerTransactionDecoder.decode(tx);
-
-
-        return null;
+        return new KlayRawTransaction(rawTx, getSenderSignatureData());
     }
 }

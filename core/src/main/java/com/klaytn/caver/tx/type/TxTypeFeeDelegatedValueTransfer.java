@@ -16,6 +16,7 @@
 
 package com.klaytn.caver.tx.type;
 
+import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.utils.KlayTransactionUtils;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
@@ -31,6 +32,7 @@ import java.util.List;
  * The fee payer address can be different from the sender.
  */
 public class TxTypeFeeDelegatedValueTransfer extends TxTypeFeeDelegate {
+
     protected TxTypeFeeDelegatedValueTransfer(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, String to,
                                               BigInteger value, String from) {
         super(nonce, gasPrice, gasLimit, from, to, value);

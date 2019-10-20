@@ -116,6 +116,12 @@ public class TxTypeFeeDelegatedAccountUpdate extends TxTypeFeeDelegate {
         return decodeFromRawTransaction(Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(rawTransaction)));
     }
 
+    /**
+     * get the keys you need to sign transactions
+     *
+     * @param credentials credentials for signing
+     * @return List of keys for signing
+     */
     protected List<ECKeyPair> getEcKeyPairsForSenderSign(KlayCredentials credentials) {
         return credentials.getEcKeyPairsForUpdateList();
     }

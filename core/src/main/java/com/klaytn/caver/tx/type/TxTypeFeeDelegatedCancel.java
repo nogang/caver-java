@@ -16,11 +16,9 @@
 
 package com.klaytn.caver.tx.type;
 
+import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.utils.KlayTransactionUtils;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
+import org.web3j.rlp.*;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
