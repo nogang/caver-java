@@ -21,6 +21,7 @@
 package com.klaytn.caver.tx.manager;
 
 import com.klaytn.caver.Caver;
+import com.klaytn.caver.Klay;
 import com.klaytn.caver.crypto.KlayCredentials;
 import com.klaytn.caver.crypto.KlaySignatureData;
 import com.klaytn.caver.methods.response.Bytes32;
@@ -174,12 +175,21 @@ public class TransactionManager {
     }
 
     public String send(KlayRawTransaction klayRawTransaction) throws IOException, PlatformErrorException {
-        Bytes32 transactionHash = caver.klay().sendSignedTransaction(klayRawTransaction.getValueAsString()).send();
-        if (transactionHash.hasError()) {
-            throw new PlatformErrorException(transactionHash.getError());
+        try {
+            Klay klay = caver.klay();
+            Bytes32 transactionHash = klay.sendSignedTransaction(klayRawTransaction.getValueAsString()).send();
+            if (transactionHash.hasError()) {
+                throw new PlatformErrorException(transactionHash.getError());
+            }
+
+            return transactionHash.getResult();
+
+        }catch (Exception e) {
+             System.out.println(e);
         }
 
-        return transactionHash.getResult();
+        return null;
+
     }
 
     public String getDefaultAddress() {
